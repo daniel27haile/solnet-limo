@@ -1,0 +1,16 @@
+// Rem conversion
+@function rem($px) {
+  @return #{$px / 16}rem;
+}
+
+// Em conversion
+@function em($px, $base: 16) {
+  @return #{$px / $base}em;
+}
+
+// Clamp font size
+@function fluid-type($min-size, $max-size, $min-width: 375, $max-width: 1200) {
+  $slope: ($max-size - $min-size) / ($max-width - $min-width);
+  $intercept: $min-size - $slope * $min-width;
+  @return clamp(#{$min-size}px, #{$intercept}px + #{$slope * 100}vw, #{$max-size}px);
+}

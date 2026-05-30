@@ -1,0 +1,218 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: $header-height;
+  @include flex-between;
+  padding: 0 $spacing-lg;
+  background: rgba($color-black, 0.95);
+  border-bottom: 1px solid rgba($color-gold, 0.15);
+  backdrop-filter: blur(12px);
+  transition: $transition-base;
+
+  @include md {
+    padding: 0 $spacing-xl;
+  }
+
+  &.scrolled {
+    height: $header-height-scroll;
+    background: rgba($color-black, 0.98);
+    border-bottom-color: rgba($color-gold, 0.25);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    text-decoration: none;
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+
+      .brand-name {
+        font-family: $font-serif;
+        font-size: 1.4rem;
+        font-weight: $font-weight-bold;
+        color: $color-gold;
+        line-height: 1.1;
+        letter-spacing: 0.05em;
+      }
+
+      .brand-tagline {
+        font-family: $font-sans;
+        font-size: 0.6rem;
+        font-weight: $font-weight-medium;
+        color: $color-silver;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .header-nav {
+    display: none;
+
+    @include lg {
+      display: flex;
+      align-items: center;
+      gap: $spacing-lg;
+    }
+
+    a {
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      font-weight: $font-weight-medium;
+      color: $color-silver;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: $transition-fast;
+      padding: $spacing-xs 0;
+      border-bottom: 1px solid transparent;
+
+      &:hover,
+      &.active {
+        color: $color-gold;
+        border-bottom-color: $color-gold;
+      }
+    }
+  }
+
+  .header-cta {
+    display: none;
+
+    @include lg {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+    }
+
+    .phone-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      font-weight: $font-weight-semibold;
+      color: $color-gold;
+      letter-spacing: 0.02em;
+
+      .material-icons { font-size: 1rem; }
+
+      &:hover { color: $color-gold-light; }
+    }
+  }
+
+  .hamburger {
+    @include lg {
+      display: none;
+    }
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: $spacing-sm;
+    cursor: pointer;
+    background: none;
+    border: none;
+
+    span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: $color-gold;
+      transition: $transition-base;
+
+      &:nth-child(1) { }
+      &:nth-child(2) { }
+      &:nth-child(3) { }
+    }
+
+    &.open {
+      span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    }
+  }
+}
+
+// Mobile nav overlay
+.mobile-nav {
+  position: fixed;
+  top: $header-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba($color-black, 0.98);
+  backdrop-filter: blur(12px);
+  padding: $spacing-xl $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  border-top: 1px solid $border-color;
+
+  @include lg {
+    display: none;
+  }
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    a {
+      font-family: $font-sans;
+      font-size: 1.25rem;
+      font-weight: $font-weight-medium;
+      color: $color-silver;
+      padding: $spacing-md 0;
+      border-bottom: 1px solid rgba($color-gold, 0.1);
+      transition: $transition-fast;
+
+      &:hover,
+      &.active {
+        color: $color-gold;
+        padding-left: $spacing-md;
+      }
+    }
+  }
+
+  .mobile-nav-footer {
+    margin-top: auto;
+    padding-top: $spacing-xl;
+
+    p {
+      font-size: 0.875rem;
+      color: $color-gray-light;
+      margin-bottom: $spacing-sm;
+    }
+
+    a.phone {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: 1.25rem;
+      font-weight: $font-weight-bold;
+      color: $color-gold;
+
+      .material-icons { font-size: 1.25rem; }
+    }
+  }
+}

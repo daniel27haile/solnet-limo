@@ -1,0 +1,43 @@
+@use '../abstracts/variables' as *;
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-serif;
+  font-weight: $font-weight-semibold;
+  line-height: 1.2;
+  color: $color-white;
+}
+
+h1 { font-size: clamp(2.2rem, 5vw, 4rem); }
+h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+h3 { font-size: clamp(1.4rem, 2.5vw, 2rem); }
+h4 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  font-family: $font-sans;
+  font-size: 1rem;
+  line-height: $line-height-base;
+  color: $color-silver;
+}
+
+.text-gold    { color: $color-gold; }
+.text-white   { color: $color-white; }
+.text-gray    { color: $color-gray-light; }
+.text-center  { text-align: center; }
+.text-left    { text-align: left; }
+.text-right   { text-align: right; }
+
+.font-serif { font-family: $font-serif; }
+.font-sans  { font-family: $font-sans; }
+
+.italic   { font-style: italic; }
+.uppercase { text-transform: uppercase; }
+.tracking-wide { letter-spacing: 0.1em; }
+.tracking-wider { letter-spacing: 0.15em; }
+
+.lead {
+  font-size: 1.125rem;
+  font-weight: $font-weight-light;
+  line-height: 1.8;
+}

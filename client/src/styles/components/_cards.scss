@@ -1,0 +1,123 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.card {
+  @include card-base;
+
+  &__image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  &__body {
+    padding: $spacing-lg;
+  }
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    @include flex-center;
+    background: rgba($color-gold, 0.1);
+    border: 1px solid rgba($color-gold, 0.3);
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
+
+    .material-icons {
+      font-size: 1.75rem;
+      color: $color-gold;
+    }
+  }
+
+  &__title {
+    font-family: $font-serif;
+    font-size: 1.3rem;
+    color: $color-white;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__text {
+    font-size: 0.9375rem;
+    color: $color-gray-light;
+    line-height: 1.7;
+    @include line-clamp(3);
+  }
+
+  &__footer {
+    padding: $spacing-md $spacing-lg $spacing-lg;
+    border-top: 1px solid $border-color;
+    margin-top: auto;
+  }
+
+  &__meta {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-md;
+
+    .meta-item {
+      @include flex-center;
+      gap: $spacing-xs;
+      font-size: 0.875rem;
+      color: $color-gray-light;
+
+      .material-icons {
+        font-size: 1rem;
+        color: $color-gold;
+      }
+    }
+  }
+
+  &__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+
+    .feature-tag {
+      padding: 4px 10px;
+      background: rgba($color-gold, 0.1);
+      border: 1px solid rgba($color-gold, 0.2);
+      border-radius: $radius-full;
+      font-size: 0.75rem;
+      color: $color-gold-light;
+    }
+  }
+}
+
+// Stats card (dashboard)
+.stat-card {
+  background: $color-dark-gray;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    @include flex-center;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
+
+    .material-icons { font-size: 1.5rem; }
+
+    &.gold   { background: rgba($color-gold, 0.15); .material-icons { color: $color-gold; } }
+    &.green  { background: rgba($color-success, 0.15); .material-icons { color: $color-success; } }
+    &.blue   { background: rgba($color-info, 0.15); .material-icons { color: $color-info; } }
+    &.red    { background: rgba($color-error, 0.15); .material-icons { color: $color-error; } }
+  }
+
+  &__value {
+    font-family: $font-serif;
+    font-size: 2.5rem;
+    color: $color-white;
+    line-height: 1;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    color: $color-gray-light;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}

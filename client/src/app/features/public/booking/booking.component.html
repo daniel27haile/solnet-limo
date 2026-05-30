@@ -1,0 +1,289 @@
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>Book Your <span>Luxury Ride</span></h1>
+    <p>Reserve your premium transportation — available 24/7 for every occasion</p>
+  </div>
+</div>
+
+<section class="section-dark-soft" style="padding-top: 0;">
+  <div class="booking-page__layout">
+
+    <!-- FORM COLUMN -->
+    <div class="booking-page__form">
+
+      @if (success()) {
+        <div class="alert alert-success" role="alert">
+          <strong>Booking Submitted!</strong> Thank you for choosing Solnet Limo. We will confirm your booking shortly. You can also call us at {{ company.phone }}.
+        </div>
+      }
+
+      @if (errorMsg()) {
+        <div class="alert alert-error" role="alert">{{ errorMsg() }}</div>
+      }
+
+      <div class="form-card">
+        <app-section-title
+          subtitle="Reservation Form"
+          title="Complete Your "
+          highlight="Booking"
+          description="Fill in the details below and we will confirm your reservation promptly."
+        />
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+          <!-- Row: Name + Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName">Full Name *</label>
+              <input
+                id="fullName"
+                type="text"
+                formControlName="fullName"
+                placeholder="Your full name"
+                autocomplete="name"
+                [class.ng-invalid]="isInvalid('fullName')"
+                [class.ng-touched]="field('fullName').touched"
+              />
+              @if (isInvalid('fullName')) {
+                <span class="field-error" role="alert">Full name is required (min. 2 characters)</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input
+                id="phone"
+                type="tel"
+                formControlName="phone"
+                placeholder="Your phone number"
+                autocomplete="tel"
+                [class.ng-invalid]="isInvalid('phone')"
+                [class.ng-touched]="field('phone').touched"
+              />
+              @if (isInvalid('phone')) {
+                <span class="field-error" role="alert">A valid phone number is required</span>
+              }
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="your@email.com"
+              autocomplete="email"
+              [class.ng-invalid]="isInvalid('email')"
+              [class.ng-touched]="field('email').touched"
+            />
+            @if (isInvalid('email')) {
+              <span class="field-error" role="alert">A valid email address is required</span>
+            }
+          </div>
+
+          <!-- Pickup + Drop-off -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pickupLocation">Pickup Location *</label>
+              <input
+                id="pickupLocation"
+                type="text"
+                formControlName="pickupLocation"
+                placeholder="Address or location"
+                [class.ng-invalid]="isInvalid('pickupLocation')"
+                [class.ng-touched]="field('pickupLocation').touched"
+              />
+              @if (isInvalid('pickupLocation')) {
+                <span class="field-error" role="alert">Pickup location is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="dropoffLocation">Drop-off Location *</label>
+              <input
+                id="dropoffLocation"
+                type="text"
+                formControlName="dropoffLocation"
+                placeholder="Address or destination"
+                [class.ng-invalid]="isInvalid('dropoffLocation')"
+                [class.ng-touched]="field('dropoffLocation').touched"
+              />
+              @if (isInvalid('dropoffLocation')) {
+                <span class="field-error" role="alert">Drop-off location is required</span>
+              }
+            </div>
+          </div>
+
+          <!-- Service Type -->
+          <div class="form-group">
+            <label for="serviceType">Service Type *</label>
+            <select
+              id="serviceType"
+              formControlName="serviceType"
+              [class.ng-invalid]="isInvalid('serviceType')"
+              [class.ng-touched]="field('serviceType').touched"
+            >
+              <option value="">Select a service...</option>
+              @for (svc of serviceTypes; track svc) {
+                <option [value]="svc">{{ svc }}</option>
+              }
+            </select>
+            @if (isInvalid('serviceType')) {
+              <span class="field-error" role="alert">Please select a service type</span>
+            }
+          </div>
+
+          <!-- Date + Time -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Date *</label>
+              <input
+                id="date"
+                type="date"
+                formControlName="date"
+                [min]="today"
+                [class.ng-invalid]="isInvalid('date')"
+                [class.ng-touched]="field('date').touched"
+              />
+              @if (isInvalid('date')) {
+                <span class="field-error" role="alert">Date is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="time">Time *</label>
+              <input
+                id="time"
+                type="time"
+                formControlName="time"
+                [class.ng-invalid]="isInvalid('time')"
+                [class.ng-touched]="field('time').touched"
+              />
+              @if (isInvalid('time')) {
+                <span class="field-error" role="alert">Time is required</span>
+              }
+            </div>
+          </div>
+
+          <!-- Passengers + Payment -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="passengers">Number of Passengers *</label>
+              <input
+                id="passengers"
+                type="number"
+                formControlName="passengers"
+                placeholder="1"
+                min="1"
+                max="20"
+                [class.ng-invalid]="isInvalid('passengers')"
+                [class.ng-touched]="field('passengers').touched"
+              />
+              @if (isInvalid('passengers')) {
+                <span class="field-error" role="alert">Please enter number of passengers (1–20)</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Preferred Payment *</label>
+              <select
+                id="paymentMethod"
+                formControlName="paymentMethod"
+                [class.ng-invalid]="isInvalid('paymentMethod')"
+                [class.ng-touched]="field('paymentMethod').touched"
+              >
+                <option value="">Select payment method...</option>
+                @for (method of paymentMethods; track method) {
+                  <option [value]="method">{{ method }}</option>
+                }
+              </select>
+              @if (isInvalid('paymentMethod')) {
+                <span class="field-error" role="alert">Please select a payment method</span>
+              }
+            </div>
+          </div>
+
+          <!-- Special Notes -->
+          <div class="form-group">
+            <label for="notes">Special Requests / Notes</label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              placeholder="Any special requests, preferences, or details we should know..."
+              rows="4"
+            ></textarea>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg btn-full"
+              [disabled]="submitting()"
+            >
+              @if (submitting()) {
+                <app-loading-spinner />
+                Submitting...
+              } @else {
+                <span class="material-icons" aria-hidden="true">event_available</span>
+                Submit Booking Request
+              }
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="booking-page__sidebar" aria-label="Contact information">
+      <div class="sidebar-card">
+        <h3>Contact Us Directly</h3>
+
+        <div class="info-item">
+          <span class="material-icons" aria-hidden="true">phone</span>
+          <div>
+            <p><strong>Phone / Text</strong>
+              <a [href]="company.phoneHref">{{ company.phone }}</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="material-icons" aria-hidden="true">email</span>
+          <div>
+            <p><strong>Email</strong>
+              <a [href]="company.emailHref">{{ company.email }}</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="material-icons" aria-hidden="true">schedule</span>
+          <div>
+            <p><strong>Availability</strong>
+              {{ company.availability }}
+            </p>
+          </div>
+        </div>
+
+        <h3 style="margin-top:24px;">We Accept</h3>
+        <div class="payment-list">
+          @for (method of paymentMethods; track method) {
+            <span>{{ method }}</span>
+          }
+        </div>
+
+        <div style="margin-top:24px; padding-top:16px; border-top:1px solid rgba(201,168,76,0.15);">
+          <p style="font-size:0.875rem; color:#888; line-height:1.6; margin:0;">
+            After submitting, we will contact you within a few hours to confirm your booking details.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>

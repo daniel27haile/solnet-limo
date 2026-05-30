@@ -1,0 +1,80 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.btn {
+  @include btn-base;
+
+  &-primary {
+    background: linear-gradient(135deg, $color-gold-dark, $color-gold, $color-gold-light);
+    color: $color-black;
+
+    &:hover {
+      background: linear-gradient(135deg, $color-gold, $color-gold-light, $color-gold);
+      box-shadow: $shadow-gold;
+      transform: translateY(-2px);
+    }
+
+    &:active { transform: translateY(0); }
+  }
+
+  &-outline {
+    background: transparent;
+    color: $color-gold;
+    border: 1px solid $color-gold;
+
+    &:hover {
+      background: $color-gold;
+      color: $color-black;
+      box-shadow: $shadow-gold;
+      transform: translateY(-2px);
+    }
+  }
+
+  &-white {
+    background: $color-white;
+    color: $color-black;
+
+    &:hover {
+      background: $color-off-white;
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+  }
+
+  &-ghost {
+    background: rgba($color-white, 0.1);
+    color: $color-white;
+    border: 1px solid rgba($color-white, 0.3);
+    backdrop-filter: blur(8px);
+
+    &:hover {
+      background: rgba($color-white, 0.2);
+      border-color: rgba($color-white, 0.6);
+    }
+  }
+
+  &-danger {
+    background: $color-error;
+    color: $color-white;
+
+    &:hover { background: darken($color-error, 10%); }
+  }
+
+  &-sm {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
+
+  &-lg {
+    padding: 18px 44px;
+    font-size: 1rem;
+  }
+
+  &-icon {
+    .material-icons {
+      font-size: 1.1rem;
+    }
+  }
+
+  &-full { width: 100%; }
+}

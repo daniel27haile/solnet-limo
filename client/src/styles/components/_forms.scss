@@ -1,0 +1,71 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.form-card {
+  background: $color-dark-gray;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-xl;
+
+  @include max-sm {
+    padding: $spacing-lg;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include md {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include sm {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+
+  @include max-sm {
+    flex-direction: column;
+  }
+}
+
+// Checkbox & Radio custom styles
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 18px;
+    height: 18px;
+    accent-color: $color-gold;
+    cursor: pointer;
+  }
+
+  label {
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: $color-silver;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+}

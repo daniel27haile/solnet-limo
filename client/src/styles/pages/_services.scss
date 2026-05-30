@@ -1,0 +1,78 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+  margin-top: $spacing-xxl;
+
+  @include sm { grid-template-columns: repeat(2, 1fr); }
+  @include lg { grid-template-columns: repeat(3, 1fr); }
+}
+
+.service-card {
+  @include card-base;
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-xl $spacing-lg;
+  text-align: center;
+
+  .service-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto $spacing-lg;
+    @include flex-center;
+    background: rgba($color-gold, 0.08);
+    border: 1px solid rgba($color-gold, 0.25);
+    border-radius: 50%;
+    transition: $transition-base;
+
+    .material-icons {
+      font-size: 1.8rem;
+      color: $color-gold;
+    }
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: $spacing-sm;
+    transition: $transition-fast;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: $color-gray-light;
+    @include line-clamp(3);
+    flex: 1;
+    margin-bottom: $spacing-lg;
+  }
+
+  &:hover {
+    .service-icon {
+      background: rgba($color-gold, 0.15);
+      border-color: $color-gold;
+    }
+
+    h3 { color: $color-gold; }
+  }
+}
+
+// Anywhere section
+.anywhere-section {
+  margin-top: $spacing-xxl;
+  padding: $spacing-xxl;
+  background: linear-gradient(135deg, $color-dark-gray, $color-mid-gray);
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  text-align: center;
+
+  .material-icons {
+    font-size: 3rem;
+    color: $color-gold;
+    margin-bottom: $spacing-lg;
+  }
+
+  h2 { margin-bottom: $spacing-md; }
+  p  { max-width: 600px; margin: 0 auto $spacing-xl; }
+}

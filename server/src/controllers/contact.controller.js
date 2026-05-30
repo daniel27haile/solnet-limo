@@ -1,0 +1,41 @@
+const asyncHandler = require('../utils/asyncHandler');
+const { success, created, error } = require('../utils/apiResponse');
+const contactService = require('../services/contact.service');
+const emailService = require('../services/email.service');
+
+exports.createMessage = asyncHandler(async (req, res) => {
+  const message = await contactService.createMessage(req.body);
+  emailService.sendContactNotification(message).catch(() => {});
+  created(res, message, 'Message sent successfully. We will respond shortly.');
+});
+
+exports.getAllMessages = asyncHandler(async (req, res) => {
+  const { isRead, page, limit } = req.query;
+  const filter = {};
+  if (isRead !== undefined) filter.isRead = isRead === 'true';
+  const result = await contactService.getAllMessages({ ...filter, page: +page, limit: +limit });
+  success(res, result);
+});
+
+exports.getMessageById = asyncHandler(async (req, res) => {
+  const message = await contactService.getMessageById(req.params.id);
+  if (!message) return error(res, 'Message not found', 404);
+  success(res, message);
+});
+
+exports.markAsRead = asyncHandler(async (req, res) => {
+  const message = await contactService.markAsRead(req.params.id);
+  if (!message) return error(res, 'Message not found', 404);
+  success(res, message, 'Message marked as read');
+});
+
+exports.deleteMessage = asyncHandler(async (req, res) => {
+  const message = await contactService.deleteMessage(req.params.id);
+  if (!message) return error(res, 'Message not found', 404);
+  success(res, null, 'Message deleted');
+});
+
+exports.getMessageStats = asyncHandler(async (req, res) => {
+  const stats = await contactService.getMessageStats();
+  success(res, stats);
+});

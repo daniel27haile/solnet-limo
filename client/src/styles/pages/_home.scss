@@ -1,0 +1,263 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// =============================================
+// HERO SECTION
+// =============================================
+.hero {
+  position: relative;
+  min-height: 100vh;
+  @include flex-center;
+  overflow: hidden;
+  background: $color-black;
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    background: url('/assets/images/hero-bg.jpg') center/cover no-repeat;
+    filter: brightness(0.35) saturate(0.8);
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba($color-black, 0.85) 0%,
+      rgba($color-black, 0.5) 50%,
+      rgba($color-black, 0.75) 100%
+    );
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+    @include container;
+    text-align: center;
+    padding-top: $header-height;
+    padding-bottom: $spacing-xxl;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: 8px 20px;
+    background: rgba($color-gold, 0.1);
+    border: 1px solid rgba($color-gold, 0.4);
+    border-radius: $radius-full;
+    font-size: 0.75rem;
+    font-weight: $font-weight-medium;
+    color: $color-gold-light;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: $spacing-xl;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: $color-success;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  &__title {
+    font-family: $font-serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: $font-weight-bold;
+    color: $color-white;
+    line-height: 1.1;
+    margin-bottom: $spacing-md;
+
+    .gold {
+      @include gold-gradient-text;
+    }
+  }
+
+  &__tagline {
+    font-family: $font-serif;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: $font-weight-light;
+    color: $color-gold-light;
+    font-style: italic;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__slogan {
+    font-size: clamp(0.875rem, 1.5vw, 1.05rem);
+    color: $color-silver;
+    max-width: 540px;
+    margin: 0 auto $spacing-xl;
+    line-height: 1.8;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    justify-content: center;
+    margin-bottom: $spacing-xxl;
+  }
+
+  &__scroll {
+    position: absolute;
+    bottom: $spacing-xl;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    color: rgba($color-gold, 0.6);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: bounce 2.5s infinite;
+
+    .material-icons { font-size: 1.25rem; }
+  }
+}
+
+// =============================================
+// AVAILABILITY BANNER
+// =============================================
+.availability-banner {
+  background: linear-gradient(135deg, $color-gold-dark, $color-gold, $color-gold-dark);
+  padding: $spacing-lg 0;
+
+  .container {
+    @include flex-center;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+    text-align: center;
+
+    .material-icons { font-size: 1.5rem; color: $color-black; }
+
+    span {
+      font-family: $font-sans;
+      font-size: 0.875rem;
+      font-weight: $font-weight-bold;
+      color: $color-black;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    strong { font-size: 1rem; }
+  }
+}
+
+// =============================================
+// WHY CHOOSE US
+// =============================================
+.why-choose {
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    margin-top: $spacing-xxl;
+
+    @include md { grid-template-columns: repeat(2, 1fr); }
+    @include xl { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  &__item {
+    text-align: center;
+    padding: $spacing-xl $spacing-lg;
+    background: $color-dark-gray;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: $color-gold;
+      transform: translateY(-6px);
+      box-shadow: $shadow-gold;
+    }
+
+    .icon-wrap {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto $spacing-lg;
+      @include flex-center;
+      background: rgba($color-gold, 0.08);
+      border: 1px solid rgba($color-gold, 0.25);
+      border-radius: 50%;
+
+      .material-icons {
+        font-size: 2rem;
+        color: $color-gold;
+      }
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: $color-gray-light;
+    }
+  }
+}
+
+// =============================================
+// PAYMENT METHODS
+// =============================================
+.payment-section {
+  background: $color-dark-gray;
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-xl 0;
+
+  .payment-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-top: $spacing-xl;
+
+    .payment-item {
+      padding: 12px 24px;
+      background: $color-mid-gray;
+      border: 1px solid rgba($color-gold, 0.2);
+      border-radius: $radius-sm;
+      font-size: 0.875rem;
+      font-weight: $font-weight-semibold;
+      color: $color-silver;
+      letter-spacing: 0.04em;
+      transition: $transition-fast;
+
+      &:hover {
+        border-color: $color-gold;
+        color: $color-gold;
+      }
+    }
+  }
+}
+
+// =============================================
+// CONTACT CTA
+// =============================================
+.contact-cta {
+  text-align: center;
+  background: linear-gradient(180deg, $color-black 0%, $color-dark-gray 100%);
+
+  h2 { margin-bottom: $spacing-md; }
+  p  { max-width: 500px; margin: 0 auto $spacing-xl; }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    justify-content: center;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}

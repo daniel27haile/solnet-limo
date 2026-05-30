@@ -1,0 +1,26 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.grid {
+  display: grid;
+  gap: $spacing-lg;
+
+  &-2 {
+    grid-template-columns: 1fr;
+    @include md { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  &-3 {
+    grid-template-columns: 1fr;
+    @include md { grid-template-columns: repeat(2, 1fr); }
+    @include lg { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  &-4 {
+    grid-template-columns: 1fr;
+    @include sm { grid-template-columns: repeat(2, 1fr); }
+    @include xl { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  &-gap-xl { gap: $spacing-xl; }
+}

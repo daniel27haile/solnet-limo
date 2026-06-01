@@ -1,0 +1,100 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.price-summary {
+  background: $color-dark-gray;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  &__header {
+    @include flex-center;
+    gap: $spacing-sm;
+    padding: $spacing-lg $spacing-xl;
+    background: rgba($color-gold, 0.06);
+    border-bottom: 1px solid $border-color;
+
+    .material-icons {
+      font-size: 1.5rem;
+      color: $color-gold;
+    }
+
+    h3 {
+      font-size: 1rem;
+      color: $color-gold;
+      font-weight: $font-weight-semibold;
+      margin: 0;
+    }
+  }
+
+  &__rows {
+    padding: $spacing-lg $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+
+    span { color: $color-gray-light; }
+
+    strong {
+      color: $color-white;
+      font-weight: $font-weight-semibold;
+    }
+
+    .badge-type {
+      padding: 3px 10px;
+      background: rgba($color-gold, 0.12);
+      border: 1px solid rgba($color-gold, 0.3);
+      border-radius: $radius-full;
+      font-size: 0.75rem;
+      color: $color-gold;
+      text-transform: capitalize;
+      font-weight: $font-weight-medium;
+    }
+
+    &--note {
+      .note {
+        font-size: 0.78rem;
+        color: $color-gray-light;
+        font-style: italic;
+      }
+    }
+  }
+
+  &__total {
+    @include flex-between;
+    padding: $spacing-lg $spacing-xl;
+    background: rgba($color-gold, 0.06);
+    border-top: 1px solid $border-color;
+
+    span {
+      font-size: 0.875rem;
+      font-weight: $font-weight-semibold;
+      color: $color-silver;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    strong {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      color: $color-gold;
+    }
+  }
+
+  &__disclaimer {
+    padding: $spacing-md $spacing-xl;
+    font-size: 0.75rem;
+    color: $color-gray-light;
+    font-style: italic;
+    text-align: center;
+    margin: 0;
+    border-top: 1px solid rgba($color-gold, 0.08);
+  }
+}

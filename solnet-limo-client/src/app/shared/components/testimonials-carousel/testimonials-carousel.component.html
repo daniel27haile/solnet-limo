@@ -1,0 +1,58 @@
+<div
+  class="carousel"
+  (mouseenter)="stopAutoSlide()"
+  (mouseleave)="startAutoSlide()"
+  aria-label="Testimonials carousel"
+  role="region"
+>
+  <!-- Viewport -->
+  <div class="carousel__viewport" aria-live="polite">
+    <div
+      class="carousel__track"
+      [class.carousel__track--transitioning]="isTransitioning"
+      [style.transform]="trackTransform"
+    >
+      @for (t of testimonials; track trackById($index, t)) {
+        <div class="carousel__item" role="group" [attr.aria-label]="'Testimonial ' + ($index + 1) + ' of ' + testimonials.length">
+          <app-testimonial-card [testimonial]="t" />
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Navigation buttons -->
+  <button
+    class="carousel__btn carousel__btn--prev"
+    (click)="handlePrev()"
+    aria-label="Previous testimonials"
+    type="button"
+  >
+    <span class="material-icons" aria-hidden="true">chevron_left</span>
+  </button>
+
+  <button
+    class="carousel__btn carousel__btn--next"
+    (click)="handleNext()"
+    aria-label="Next testimonials"
+    type="button"
+  >
+    <span class="material-icons" aria-hidden="true">chevron_right</span>
+  </button>
+
+  <!-- Dot indicators -->
+  @if (totalPages > 1) {
+    <div class="carousel__dots" role="tablist" aria-label="Slide pages">
+      @for (page of dotPages(); track $index) {
+        <button
+          class="carousel__dot"
+          [class.carousel__dot--active]="currentPage === $index"
+          (click)="snapToPage($index)"
+          [attr.aria-label]="'Go to page ' + ($index + 1)"
+          [attr.aria-selected]="currentPage === $index"
+          role="tab"
+          type="button"
+        ></button>
+      }
+    </div>
+  }
+</div>

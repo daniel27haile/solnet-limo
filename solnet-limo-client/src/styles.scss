@@ -1,0 +1,240 @@
+// =============================================
+// GLOBAL STYLESHEET - Solnet Limo
+// =============================================
+
+// Abstracts
+@use 'styles/abstracts/variables' as *;
+@use 'styles/abstracts/mixins' as *;
+@use 'styles/abstracts/functions' as *;
+
+// Base
+@use 'styles/base/reset';
+@use 'styles/base/typography';
+@use 'styles/base/global';
+
+// Components
+@use 'styles/components/buttons';
+@use 'styles/components/cards';
+@use 'styles/components/forms';
+
+// Layout
+@use 'styles/layout/header';
+@use 'styles/layout/footer';
+@use 'styles/layout/grid';
+
+// Pages
+@use 'styles/pages/home';
+@use 'styles/pages/services';
+@use 'styles/pages/booking';
+
+// Pricing preview (admin)
+.pricing-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: rgba($color-info, 0.08);
+  border: 1px solid rgba($color-info, 0.2);
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  color: $color-silver;
+  margin-bottom: $spacing-lg;
+
+  .material-icons { font-size: 1rem; color: $color-info; flex-shrink: 0; margin-top: 2px; }
+}
+
+// Admin overrides
+.admin-layout {
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: $color-black-soft;
+    border-right: 1px solid $border-color;
+    padding: $spacing-lg 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    .sidebar-brand {
+      padding: $spacing-lg $spacing-xl;
+      border-bottom: 1px solid $border-color;
+      margin-bottom: $spacing-md;
+
+      span {
+        font-family: $font-serif;
+        font-size: 1.3rem;
+        color: $color-gold;
+      }
+      small {
+        display: block;
+        font-size: 0.7rem;
+        color: $color-gray-light;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+    }
+
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+      padding: 14px $spacing-xl;
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+      color: $color-gray-light;
+      transition: $transition-fast;
+
+      .material-icons { font-size: 1.1rem; }
+
+      &:hover,
+      &.active {
+        color: $color-gold;
+        background: rgba($color-gold, 0.05);
+        border-right: 2px solid $color-gold;
+      }
+    }
+  }
+
+  .admin-content {
+    margin-left: 260px;
+    min-height: 100vh;
+    background: $color-black;
+
+    .admin-topbar {
+      height: 64px;
+      @include flex-between;
+      padding: 0 $spacing-xl;
+      background: $color-black-soft;
+      border-bottom: 1px solid $border-color;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+
+      h1 {
+        font-size: 1.2rem;
+        font-weight: $font-weight-semibold;
+        color: $color-white;
+      }
+
+      .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+
+        span { font-size: 0.875rem; color: $color-gray-light; }
+
+        button {
+          @include flex-center;
+          gap: 6px;
+          padding: 8px 16px;
+          background: rgba($color-error, 0.1);
+          border: 1px solid rgba($color-error, 0.3);
+          border-radius: $radius-sm;
+          font-size: 0.8rem;
+          color: $color-error;
+          cursor: pointer;
+          transition: $transition-fast;
+
+          &:hover { background: rgba($color-error, 0.2); }
+          .material-icons { font-size: 0.9rem; }
+        }
+      }
+    }
+
+    .admin-body {
+      padding: $spacing-xl;
+    }
+  }
+
+  @include max-lg {
+    .sidebar { display: none; }
+    .admin-content { margin-left: 0; }
+  }
+}
+
+// Admin table
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $color-dark-gray;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  th {
+    padding: $spacing-md $spacing-lg;
+    background: $color-mid-gray;
+    font-size: 0.75rem;
+    font-weight: $font-weight-bold;
+    color: $color-gold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-md $spacing-lg;
+    font-size: 0.875rem;
+    color: $color-silver;
+    border-bottom: 1px solid rgba($color-gold, 0.08);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td {
+    background: rgba($color-gold, 0.03);
+  }
+
+  .table-actions {
+    display: flex;
+    gap: $spacing-sm;
+
+    button {
+      padding: 6px 12px;
+      border-radius: $radius-sm;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: $transition-fast;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .material-icons { font-size: 0.875rem; }
+
+      &.btn-view  { background: rgba($color-info, 0.15); color: $color-info; border: 1px solid rgba($color-info, 0.3); &:hover { background: rgba($color-info, 0.25); } }
+      &.btn-edit  { background: rgba($color-gold, 0.15); color: $color-gold; border: 1px solid rgba($color-gold, 0.3); &:hover { background: rgba($color-gold, 0.25); } }
+      &.btn-delete { background: rgba($color-error, 0.15); color: $color-error; border: 1px solid rgba($color-error, 0.3); &:hover { background: rgba($color-error, 0.25); } }
+    }
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-xl;
+
+  button {
+    padding: 8px 14px;
+    background: $color-dark-gray;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.875rem;
+    color: $color-silver;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &.active,
+    &:hover {
+      background: $color-gold;
+      color: $color-black;
+      border-color: $color-gold;
+    }
+
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}

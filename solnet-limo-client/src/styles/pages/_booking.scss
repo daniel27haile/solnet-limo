@@ -1,0 +1,31 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// Global alert styles used by booking + other pages
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-sm;
+  font-size: 0.9rem;
+  margin-bottom: $spacing-lg;
+
+  .material-icons { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  &-success {
+    background: rgba($color-success, 0.1);
+    border: 1px solid rgba($color-success, 0.3);
+    color: lighten($color-success, 20%);
+  }
+
+  &-error {
+    background: rgba($color-error, 0.1);
+    border: 1px solid rgba($color-error, 0.3);
+    color: lighten($color-error, 20%);
+    flex-wrap: wrap;
+    row-gap: $spacing-sm;
+
+    .btn { margin-left: auto; }
+  }
+}

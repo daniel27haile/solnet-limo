@@ -1,0 +1,366 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+// ─── Wizard Layout ────────────────────────────────────────────────────────────
+
+.booking-wizard {
+  padding-top: 0;
+
+  &__layout {
+    @include container;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    padding-bottom: $spacing-xxl;
+
+    @include lg {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  &__form {
+    .form-card {
+      min-height: 420px;
+    }
+  }
+
+  &__sidebar {
+    .sidebar-card {
+      background: $color-dark-gray;
+      border: 1px solid $border-color;
+      border-radius: $radius-md;
+      padding: $spacing-xl;
+      position: sticky;
+      top: calc(#{$header-height} + #{$spacing-lg});
+
+      h3 {
+        font-size: 1.1rem;
+        color: $color-gold;
+        margin-bottom: $spacing-lg;
+        padding-bottom: $spacing-sm;
+        border-bottom: 1px solid $border-color;
+      }
+
+      .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: $spacing-md;
+        margin-bottom: $spacing-lg;
+
+        .material-icons {
+          font-size: 1.25rem;
+          color: $color-gold;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+
+        p {
+          font-size: 0.875rem;
+          color: $color-gray-light;
+          margin: 0;
+
+          strong {
+            display: block;
+            color: $color-white;
+            margin-bottom: 2px;
+            font-weight: $font-weight-medium;
+          }
+
+          a {
+            color: $color-gold;
+            &:hover { text-decoration: underline; }
+          }
+        }
+      }
+
+      .sidebar-secure {
+        display: flex;
+        align-items: flex-start;
+        gap: $spacing-sm;
+        padding: $spacing-md;
+        background: rgba($color-success, 0.06);
+        border: 1px solid rgba($color-success, 0.2);
+        border-radius: $radius-sm;
+        margin-top: $spacing-lg;
+
+        .material-icons {
+          font-size: 1rem;
+          color: $color-success;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+
+        p {
+          font-size: 0.8rem;
+          color: $color-gray-light;
+          margin: 0;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}
+
+// ─── Location Field ───────────────────────────────────────────────────────────
+
+.location-field {
+  display: flex;
+  gap: $spacing-sm;
+
+  input { flex: 1; }
+
+  .btn-location {
+    @include flex-center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    background: $color-mid-gray;
+    border: 1px solid rgba($color-gold, 0.3);
+    border-radius: $radius-sm;
+    color: $color-gold;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover:not(:disabled) {
+      background: rgba($color-gold, 0.15);
+      border-color: $color-gold;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .material-icons { font-size: 1.2rem; }
+  }
+}
+
+// ─── Review Grid ──────────────────────────────────────────────────────────────
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+
+  @include sm {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-mid-gray;
+  border: 1px solid rgba($color-gold, 0.1);
+  border-radius: $radius-sm;
+
+  .material-icons {
+    font-size: 1.1rem;
+    color: $color-gold;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  div {
+    label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: $color-gray-light;
+      margin-bottom: 2px;
+      font-weight: $font-weight-semibold;
+    }
+
+    p {
+      font-size: 0.875rem;
+      color: $color-white;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+}
+
+// ─── Pricing Section ─────────────────────────────────────────────────────────
+
+.pricing-section {
+  margin-top: $spacing-lg;
+}
+
+.pricing-loading {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-xxl;
+  color: $color-gray-light;
+  font-size: 0.875rem;
+}
+
+// ─── Payment ─────────────────────────────────────────────────────────────────
+
+.payment-amount-banner {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: rgba($color-gold, 0.08);
+  border: 1px solid rgba($color-gold, 0.3);
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-xl;
+
+  .material-icons {
+    font-size: 1.75rem;
+    color: $color-gold;
+  }
+
+  div {
+    span {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: $color-gray-light;
+      margin-bottom: 4px;
+    }
+    strong {
+      font-size: 1.5rem;
+      color: $color-gold;
+      font-weight: $font-weight-bold;
+    }
+  }
+}
+
+.square-card-wrapper {
+  min-height: 120px;
+  margin-bottom: $spacing-xl;
+
+  #card-container {
+    &.hidden { display: none; }
+  }
+}
+
+.square-loading {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-xl;
+  color: $color-gray-light;
+  font-size: 0.875rem;
+}
+
+// ─── Step Navigation ─────────────────────────────────────────────────────────
+
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid $border-color;
+  gap: $spacing-md;
+
+  .btn-pay {
+    padding-left: $spacing-xl;
+    padding-right: $spacing-xl;
+  }
+
+  @include max-sm {
+    flex-direction: column-reverse;
+    .btn { width: 100%; justify-content: center; }
+  }
+}
+
+// ─── Confirmation ─────────────────────────────────────────────────────────────
+
+.booking-confirmation {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  padding: $spacing-xxl 0;
+
+  &__icon {
+    .material-icons {
+      font-size: 5rem;
+      color: $color-success;
+      display: block;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  h2 {
+    font-size: 2rem;
+    color: $color-white;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__sub {
+    font-size: 1rem;
+    color: $color-gray-light;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.confirmation-card {
+  background: $color-dark-gray;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  overflow: hidden;
+  text-align: left;
+  margin-bottom: $spacing-xl;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md $spacing-xl;
+    border-bottom: 1px solid rgba($color-gold, 0.08);
+    font-size: 0.9rem;
+    gap: $spacing-md;
+
+    &:last-child { border-bottom: none; }
+
+    span:first-child {
+      color: $color-gray-light;
+      flex-shrink: 0;
+    }
+
+    strong {
+      color: $color-white;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .mono {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: $color-gold-light;
+    }
+
+    &--total {
+      background: rgba($color-gold, 0.05);
+      border-top: 1px solid $border-color;
+
+      span { font-weight: $font-weight-bold; color: $color-silver; }
+      strong { font-size: 1.25rem; color: $color-gold; }
+    }
+  }
+}
+
+.confirmation-note {
+  font-size: 0.875rem;
+  color: $color-gray-light;
+  line-height: 1.7;
+
+  strong { color: $color-white; }
+  a { color: $color-gold; &:hover { text-decoration: underline; } }
+}
+
+// half-width helper
+.form-group--half {
+  @include sm {
+    max-width: 50%;
+  }
+}

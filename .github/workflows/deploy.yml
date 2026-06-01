@@ -1,0 +1,130 @@
+name: Deploy Solnet Limo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Node.js ─────────────────────────────────────────────────────────────
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ── Frontend build ───────────────────────────────────────────────────────
+
+      - name: Install frontend dependencies
+        working-directory: solnet-limo-client
+        run: npm ci
+
+      - name: Write production environment file
+        working-directory: solnet-limo-client
+        env:
+          API_URL: ${{ vars.ANGULAR_API_BASE_URL || 'https://api.solnetlimo.com/api' }}
+          MAPS_KEY: ${{ secrets.GOOGLE_MAPS_BROWSER_API_KEY }}
+          SQUARE_APP_ID: ${{ secrets.SQUARE_APPLICATION_ID }}
+          SQUARE_LOCATION: ${{ secrets.SQUARE_LOCATION_ID }}
+        run: |
+          cat > src/environments/environment.prod.ts << EOF
+          export const environment = {
+            production: true,
+            apiUrl: '${API_URL}',
+            googleMapsBrowserKey: '${MAPS_KEY}',
+            squareAppId: '${SQUARE_APP_ID}',
+            squareLocationId: '${SQUARE_LOCATION}',
+            squareSdkUrl: 'https://web.squarecdn.com/v1/square.js',
+          };
+          EOF
+
+      - name: Build frontend (production)
+        working-directory: solnet-limo-client
+        run: npm run build -- --configuration production
+
+      # ── Backend check ────────────────────────────────────────────────────────
+
+      - name: Install backend dependencies
+        working-directory: solnet-limo-api
+        run: npm ci
+
+      - name: Backend syntax check
+        working-directory: solnet-limo-api
+        run: node --check src/server.js
+
+      # ── SSH setup ────────────────────────────────────────────────────────────
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DO_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.DO_PORT }} ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+
+      # ── Create remote folders ────────────────────────────────────────────────
+
+      - name: Create deployment folders on server
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+            "sudo mkdir -p /var/www/solnet-limo/solnet-limo-client && \
+             sudo mkdir -p /var/www/solnet-limo/solnet-limo-api && \
+             sudo chown -R \$USER:\$USER /var/www/solnet-limo"
+
+      # ── Deploy frontend ──────────────────────────────────────────────────────
+      # Angular 18 application builder outputs to dist/solnet-limo/browser/
+      # We deploy that browser/ folder contents directly to the server path.
+
+      - name: Deploy frontend build
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }}" \
+            solnet-limo-client/dist/solnet-limo/browser/ \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/solnet-limo/solnet-limo-client/
+
+      # ── Deploy backend ───────────────────────────────────────────────────────
+      # .env is excluded — the production .env lives on the server and is never overwritten.
+
+      - name: Deploy backend source
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }}" \
+            --exclude node_modules \
+            --exclude .env \
+            --exclude .git \
+            --exclude logs \
+            solnet-limo-api/ \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/solnet-limo/solnet-limo-api/
+
+      # ── Install deps and restart PM2 ─────────────────────────────────────────
+
+      - name: Install backend production dependencies and restart PM2
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+            "cd /var/www/solnet-limo/solnet-limo-api && \
+             npm ci --omit=dev && \
+             if pm2 describe solnet-limo-api > /dev/null 2>&1; then \
+               pm2 restart solnet-limo-api; \
+             else \
+               pm2 start src/server.js --name solnet-limo-api; \
+             fi && \
+             pm2 save"
+
+      # ── Reload Nginx ─────────────────────────────────────────────────────────
+
+      - name: Reload Nginx
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+            "sudo nginx -t && sudo systemctl reload nginx"

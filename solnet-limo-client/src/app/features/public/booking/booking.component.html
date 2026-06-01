@@ -1,0 +1,543 @@
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>Book Your <span>Luxury Ride</span></h1>
+    <p>Reserve your premium transportation — available 24/7 for every occasion</p>
+  </div>
+</div>
+
+<section class="booking-wizard section-dark-soft">
+  <div class="container">
+
+    <!-- Step 4: Confirmation — full-width, no form card -->
+    @if (currentStep() === 4) {
+      <div class="booking-confirmation">
+        <div class="booking-confirmation__icon">
+          <span class="material-icons" aria-hidden="true">check_circle</span>
+        </div>
+        <h2>Booking Confirmed!</h2>
+        <p class="booking-confirmation__sub">
+          Thank you, {{ confirmation()?.bookingId ? formValue.fullName : '' }}! Your ride is reserved.
+        </p>
+
+        @if (confirmation(); as conf) {
+          <div class="confirmation-card">
+            <div class="confirmation-card__row">
+              <span>Booking ID</span>
+              <strong class="mono">{{ conf.bookingId }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Pickup</span>
+              <strong>{{ formValue.pickupLocation }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Drop-off</span>
+              <strong>{{ formValue.dropoffLocation }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Vehicle</span>
+              <strong>{{ formValue.vehicleType }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Service</span>
+              <strong>{{ formValue.serviceType }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Date & Time</span>
+              <strong>{{ tripDate }} at {{ formValue.time }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Distance</span>
+              <strong>{{ conf.distanceMiles }} miles</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Rate</span>
+              <strong>${{ conf.rateUsed }}/mile ({{ conf.pricingType }})</strong>
+            </div>
+            <div class="confirmation-card__row confirmation-card__row--total">
+              <span>Total Paid</span>
+              <strong>${{ conf.finalTotal.toFixed(2) }} {{ conf.currency }}</strong>
+            </div>
+            <div class="confirmation-card__row">
+              <span>Payment</span>
+              <span class="badge badge-completed">{{ conf.paymentStatus }}</span>
+            </div>
+          </div>
+
+          <p class="confirmation-note">
+            A confirmation email has been sent to <strong>{{ formValue.email }}</strong>.
+            We will contact you shortly. Questions? Call
+            <a [href]="company.phoneHref">{{ company.phone }}</a>.
+          </p>
+        }
+      </div>
+    } @else {
+
+      <!-- Progress Stepper -->
+      <app-progress-stepper [steps]="stepLabels" [currentStep]="currentStep()" />
+
+      <!-- Form Card -->
+      <div class="booking-wizard__layout">
+        <div class="booking-wizard__form">
+          <div class="form-card">
+
+            <!-- STEP 1: Trip Info -->
+            @if (currentStep() === 0) {
+              <app-section-title
+                subtitle="Step 1 of 4"
+                title="Trip "
+                highlight="Information"
+                description="Tell us where you're going. Use your current location or enter an address manually."
+              />
+
+              <form [formGroup]="form" novalidate>
+
+                <!-- Pickup with location option -->
+                <div class="form-group">
+                  <label for="pickupLocation">Pickup Location *</label>
+                  <div class="location-field">
+                    <input
+                      id="pickupLocation"
+                      type="text"
+                      formControlName="pickupLocation"
+                      placeholder="Enter pickup address"
+                      autocomplete="off"
+                      [class.ng-invalid]="isInvalid('pickupLocation')"
+                      [class.ng-touched]="field('pickupLocation').touched"
+                    />
+                    <button
+                      type="button"
+                      class="btn-location"
+                      (click)="useCurrentLocation()"
+                      [disabled]="locating()"
+                      title="Use current location"
+                      aria-label="Use current location"
+                    >
+                      @if (locating()) {
+                        <app-loading-spinner />
+                      } @else {
+                        <span class="material-icons">my_location</span>
+                      }
+                    </button>
+                  </div>
+                  @if (locationError()) {
+                    <span class="field-error" role="alert">{{ locationError() }}</span>
+                  }
+                  @if (isInvalid('pickupLocation')) {
+                    <span class="field-error" role="alert">Pickup location is required</span>
+                  }
+                </div>
+
+                <!-- Drop-off -->
+                <div class="form-group">
+                  <label for="dropoffLocation">Drop-off Location *</label>
+                  <input
+                    id="dropoffLocation"
+                    type="text"
+                    formControlName="dropoffLocation"
+                    placeholder="Enter drop-off address"
+                    autocomplete="off"
+                    [class.ng-invalid]="isInvalid('dropoffLocation')"
+                    [class.ng-touched]="field('dropoffLocation').touched"
+                  />
+                  @if (isInvalid('dropoffLocation')) {
+                    <span class="field-error" role="alert">Drop-off location is required</span>
+                  }
+                </div>
+
+                <!-- Service Type + Vehicle Type -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="serviceType">Service Type *</label>
+                    <select
+                      id="serviceType"
+                      formControlName="serviceType"
+                      [class.ng-invalid]="isInvalid('serviceType')"
+                      [class.ng-touched]="field('serviceType').touched"
+                    >
+                      <option value="">Select a service...</option>
+                      @for (svc of serviceTypes; track svc) {
+                        <option [value]="svc">{{ svc }}</option>
+                      }
+                    </select>
+                    @if (isInvalid('serviceType')) {
+                      <span class="field-error" role="alert">Please select a service</span>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label for="vehicleType">Vehicle Type *</label>
+                    @if (loadingVehicles()) {
+                      <select id="vehicleType" formControlName="vehicleType" [attr.disabled]="true">
+                        <option value="">Loading vehicles...</option>
+                      </select>
+                    } @else {
+                      <select
+                        id="vehicleType"
+                        formControlName="vehicleType"
+                        [class.ng-invalid]="isInvalid('vehicleType')"
+                        [class.ng-touched]="field('vehicleType').touched"
+                      >
+                        <option value="">Select vehicle type...</option>
+                        @for (v of vehicleTypes(); track v) {
+                          <option [value]="v">{{ v }}</option>
+                        }
+                      </select>
+                    }
+                    @if (isInvalid('vehicleType')) {
+                      <span class="field-error" role="alert">Please select a vehicle type</span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Date + Time -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="date">Date *</label>
+                    <input
+                      id="date"
+                      type="date"
+                      formControlName="date"
+                      [min]="today"
+                      [class.ng-invalid]="isInvalid('date')"
+                      [class.ng-touched]="field('date').touched"
+                    />
+                    @if (isInvalid('date')) {
+                      <span class="field-error" role="alert">Date is required</span>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label for="time">Time *</label>
+                    <input
+                      id="time"
+                      type="time"
+                      formControlName="time"
+                      [class.ng-invalid]="isInvalid('time')"
+                      [class.ng-touched]="field('time').touched"
+                    />
+                    @if (isInvalid('time')) {
+                      <span class="field-error" role="alert">Time is required</span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Passengers -->
+                <div class="form-group form-group--half">
+                  <label for="passengers">Passengers *</label>
+                  <input
+                    id="passengers"
+                    type="number"
+                    formControlName="passengers"
+                    placeholder="1"
+                    min="1"
+                    max="20"
+                    [class.ng-invalid]="isInvalid('passengers')"
+                    [class.ng-touched]="field('passengers').touched"
+                  />
+                  @if (isInvalid('passengers')) {
+                    <span class="field-error" role="alert">Enter number of passengers (1–20)</span>
+                  }
+                </div>
+
+              </form>
+            }
+
+            <!-- STEP 2: Customer Details -->
+            @if (currentStep() === 1) {
+              <app-section-title
+                subtitle="Step 2 of 4"
+                title="Your "
+                highlight="Details"
+                description="Tell us how to reach you to confirm your booking."
+              />
+
+              <form [formGroup]="form" novalidate>
+
+                <div class="form-group">
+                  <label for="fullName">Full Name *</label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    formControlName="fullName"
+                    placeholder="Your full name"
+                    autocomplete="name"
+                    [class.ng-invalid]="isInvalid('fullName')"
+                    [class.ng-touched]="field('fullName').touched"
+                  />
+                  @if (isInvalid('fullName')) {
+                    <span class="field-error" role="alert">Full name is required (min. 2 characters)</span>
+                  }
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      formControlName="phone"
+                      placeholder="Your phone number"
+                      autocomplete="tel"
+                      [class.ng-invalid]="isInvalid('phone')"
+                      [class.ng-touched]="field('phone').touched"
+                    />
+                    @if (isInvalid('phone')) {
+                      <span class="field-error" role="alert">A valid phone number is required</span>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input
+                      id="email"
+                      type="email"
+                      formControlName="email"
+                      placeholder="your@email.com"
+                      autocomplete="email"
+                      [class.ng-invalid]="isInvalid('email')"
+                      [class.ng-touched]="field('email').touched"
+                    />
+                    @if (isInvalid('email')) {
+                      <span class="field-error" role="alert">A valid email is required</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="notes">Special Requests / Notes</label>
+                  <textarea
+                    id="notes"
+                    formControlName="notes"
+                    placeholder="Any special requests or details we should know..."
+                    rows="4"
+                  ></textarea>
+                </div>
+
+              </form>
+            }
+
+            <!-- STEP 3: Review & Price -->
+            @if (currentStep() === 2) {
+              <app-section-title
+                subtitle="Step 3 of 4"
+                title="Review & "
+                highlight="Price"
+                description="Confirm your trip details and review the estimated price before payment."
+              />
+
+              <!-- Trip summary -->
+              <div class="review-grid">
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">location_on</span>
+                  <div>
+                    <label>Pickup</label>
+                    <p>{{ formValue.pickupLocation }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">flag</span>
+                  <div>
+                    <label>Drop-off</label>
+                    <p>{{ formValue.dropoffLocation }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">directions_car</span>
+                  <div>
+                    <label>Vehicle</label>
+                    <p>{{ formValue.vehicleType }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">build_circle</span>
+                  <div>
+                    <label>Service</label>
+                    <p>{{ formValue.serviceType }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">event</span>
+                  <div>
+                    <label>Date & Time</label>
+                    <p>{{ tripDate }} at {{ formValue.time }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">people</span>
+                  <div>
+                    <label>Passengers</label>
+                    <p>{{ formValue.passengers }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">person</span>
+                  <div>
+                    <label>Name</label>
+                    <p>{{ formValue.fullName }}</p>
+                  </div>
+                </div>
+                <div class="review-item">
+                  <span class="material-icons" aria-hidden="true">phone</span>
+                  <div>
+                    <label>Phone</label>
+                    <p>{{ formValue.phone }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pricing -->
+              <div class="pricing-section">
+                @if (loadingPrice()) {
+                  <div class="pricing-loading">
+                    <app-loading-spinner />
+                    <p>Calculating your price...</p>
+                  </div>
+                } @else if (priceError()) {
+                  <div class="alert alert-error" role="alert">
+                    <span class="material-icons">error</span>
+                    {{ priceError() }}
+                    <button type="button" class="btn btn-outline btn-sm" (click)="retryPricing()">
+                      Retry
+                    </button>
+                  </div>
+                } @else if (priceResult()) {
+                  <app-price-summary [pricing]="priceResult()!" />
+                }
+              </div>
+            }
+
+            <!-- STEP 4: Payment -->
+            @if (currentStep() === 3) {
+              <app-section-title
+                subtitle="Step 4 of 4"
+                title="Secure "
+                highlight="Payment"
+                description="Enter your card details below. Your payment is processed securely via Square."
+              />
+
+              @if (priceResult()) {
+                <div class="payment-amount-banner">
+                  <span class="material-icons" aria-hidden="true">paid</span>
+                  <div>
+                    <span>Amount Due</span>
+                    <strong>${{ priceResult()!.estimatedTotal.toFixed(2) }} USD</strong>
+                  </div>
+                </div>
+              }
+
+              <div class="square-card-wrapper">
+                @if (!squareReady()) {
+                  <div class="square-loading">
+                    <app-loading-spinner />
+                    <p>Loading payment form...</p>
+                  </div>
+                }
+                <div id="card-container" [class.hidden]="!squareReady()"></div>
+              </div>
+
+              @if (squareError()) {
+                <div class="alert alert-error" role="alert">
+                  <span class="material-icons">error</span>
+                  {{ squareError() }}
+                </div>
+              }
+            }
+
+            <!-- Step error -->
+            @if (stepError()) {
+              <div class="alert alert-error" role="alert">{{ stepError() }}</div>
+            }
+
+            <!-- Navigation Buttons -->
+            <div class="step-nav">
+              @if (currentStep() > 0) {
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  (click)="prevStep()"
+                  [disabled]="submitting()"
+                >
+                  <span class="material-icons" aria-hidden="true">arrow_back</span>
+                  Back
+                </button>
+              } @else {
+                <span></span>
+              }
+
+              @if (currentStep() < 3) {
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="nextStep()"
+                  [disabled]="currentStep() === 2 && loadingPrice()"
+                >
+                  Continue
+                  <span class="material-icons" aria-hidden="true">arrow_forward</span>
+                </button>
+              }
+
+              @if (currentStep() === 3) {
+                <button
+                  type="button"
+                  class="btn btn-primary btn-pay"
+                  (click)="submitPayment()"
+                  [disabled]="submitting() || !squareReady()"
+                >
+                  @if (submitting()) {
+                    <app-loading-spinner />
+                    Processing...
+                  } @else {
+                    <span class="material-icons" aria-hidden="true">lock</span>
+                    Pay ${{ priceResult()?.estimatedTotal?.toFixed(2) ?? '0.00' }}
+                  }
+                </button>
+              }
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="booking-wizard__sidebar" aria-label="Contact information">
+          <div class="sidebar-card">
+            <h3>Need Help?</h3>
+
+            <div class="info-item">
+              <span class="material-icons" aria-hidden="true">phone</span>
+              <div>
+                <p><strong>Phone / Text</strong>
+                  <a [href]="company.phoneHref">{{ company.phone }}</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="material-icons" aria-hidden="true">email</span>
+              <div>
+                <p><strong>Email</strong>
+                  <a [href]="company.emailHref">{{ company.email }}</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="material-icons" aria-hidden="true">schedule</span>
+              <div>
+                <p><strong>Availability</strong>{{ company.availability }}</p>
+              </div>
+            </div>
+
+            @if (currentStep() === 3) {
+              <div class="sidebar-secure">
+                <span class="material-icons">lock</span>
+                <p>Payments are processed securely via Square. We never store your card details.</p>
+              </div>
+            }
+          </div>
+        </aside>
+      </div>
+
+    }
+  </div>
+</section>

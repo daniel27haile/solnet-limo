@@ -1,10 +1,10 @@
-# Solnet Limo — Full-Stack Website
+# Solnet Limo
 
 **Elite Transportation Service by Solomon**
 > Create an Elegant Impression & a Memory for the Lifetime!
 
 - **Phone:** 970-473-1479
-- **Email:** Smoges16@yahoo.com
+- **Email:** hello@solnetlimo.com
 - **Availability:** 24/7
 
 ---
@@ -13,33 +13,43 @@
 
 ```
 solnet-limo/
-├── server/          # Node.js / Express / MongoDB backend
-└── client/          # Angular 18 frontend
+├── solnet-limo-client/   # Angular 18 frontend
+├── solnet-limo-api/      # Node.js / Express / MongoDB API
+├── .github/
+│   └── workflows/
+│       └── deploy.yml    # CI/CD — deploys on push to main
+├── DEPLOYMENT.md         # DigitalOcean + Nginx + DNS setup guide
+└── .gitignore
 ```
 
 ---
 
-## Quick Start
+## Local Development
 
-### 1. Backend Setup
+### 1. Backend (API)
 
 ```bash
-cd server
+cd solnet-limo-api
 npm install
 cp .env.example .env
-# Edit .env — add your MONGO_URI and JWT_SECRET
-npm run seed       # seeds services, fleet, and admin user
+# Edit .env — set MONGO_URI, JWT_SECRET, and any optional keys
 npm run dev        # starts on http://localhost:5000
+```
+
+Seed the database (creates services, fleet, admin user):
+
+```bash
+npm run seed
 ```
 
 **Default admin credentials (change after first login):**
 - Email: `admin@solnetlimo.com`
 - Password: `SolnetAdmin2024!`
 
-### 2. Frontend Setup
+### 2. Frontend (Client)
 
 ```bash
-cd client
+cd solnet-limo-client
 npm install
 npm start          # starts on http://localhost:4200
 ```
@@ -48,117 +58,108 @@ The Angular dev server proxies `/api` calls to `http://localhost:5000` via `prox
 
 ---
 
-## Environment Variables (server/.env)
+## Production Build
 
-```env
-MONGO_URI=mongodb://localhost:27017/solnet-limo
-PORT=5000
-JWT_SECRET=your_super_secret_jwt_key_change_this
-CLIENT_URL=http://localhost:4200
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-ADMIN_NOTIFICATION_EMAIL=Smoges16@yahoo.com
-NODE_ENV=development
+### Frontend
+
+```bash
+cd solnet-limo-client
+npm ci
+npm run build -- --configuration production
+# Output: dist/solnet-limo/browser/
+```
+
+### Backend
+
+```bash
+cd solnet-limo-api
+npm ci --omit=dev
+npm start
 ```
 
 ---
 
-## Image Assets
+## Environment Variables
 
-Place your images in these folders inside `client/src/assets/images/`:
+### Backend (`solnet-limo-api/.env`)
 
-```
-assets/images/
-├── hero-bg.jpg              ← Hero section background (dark luxury SUV/limo scene)
-├── fleet/
-│   ├── black-suv.jpg
-│   ├── stretch-limo.jpg
-│   ├── luxury-sedan.jpg
-│   ├── luxury-van.jpg
-│   └── default-vehicle.jpg  ← Fallback image
-├── about/
-│   └── chauffeur.jpg        ← Professional chauffeur photo
-└── logo.png                 ← Company logo (optional)
-```
+| Variable | Description |
+|---|---|
+| `NODE_ENV` | `production` or `development` |
+| `PORT` | API port (default `5000`) |
+| `MONGO_URI` | MongoDB connection string |
+| `JWT_SECRET` | Strong random secret for JWT signing |
+| `CLIENT_URL` | Frontend origin for CORS (e.g. `https://www.solnetlimo.com`) |
+| `GOOGLE_MAPS_API_KEY` | Server-side Maps key (Distance Matrix, Geocoding) |
+| `SQUARE_ACCESS_TOKEN` | Square payment access token |
+| `SQUARE_ENVIRONMENT` | `sandbox` or `production` |
+| `SQUARE_LOCATION_ID` | Square location ID |
+| `EMAIL_HOST` | SMTP host |
+| `EMAIL_PORT` | SMTP port (typically `587`) |
+| `EMAIL_USER` | SMTP user |
+| `EMAIL_PASS` | SMTP app password |
+| `ADMIN_NOTIFICATION_EMAIL` | Receives booking notifications |
 
-**Recommended image specs:**
-- Hero: 1920×1080px minimum, dark/moody tone
-- Fleet vehicles: 800×600px, 16:9 ratio
-- About chauffeur: 800×600px
+### Frontend (injected at build time via GitHub Actions)
+
+| GitHub Secret / Variable | Destination |
+|---|---|
+| `ANGULAR_API_BASE_URL` (var) | `environment.apiUrl` |
+| `GOOGLE_MAPS_BROWSER_API_KEY` | `environment.googleMapsBrowserKey` |
+| `SQUARE_APPLICATION_ID` | `environment.squareAppId` |
+| `SQUARE_LOCATION_ID` | `environment.squareLocationId` |
+
+---
+
+## CI/CD — GitHub Actions
+
+Deployment runs automatically on every push to `main`.
+
+### Required GitHub Secrets
+
+| Secret | Value |
+|---|---|
+| `DO_HOST` | DigitalOcean Droplet IP address |
+| `DO_USER` | SSH user (e.g. `root` or `deploy`) |
+| `DO_PORT` | SSH port (typically `22`) |
+| `DO_SSH_KEY` | Full contents of your private SSH key |
+| `GOOGLE_MAPS_BROWSER_API_KEY` | Google Maps browser key |
+| `SQUARE_APPLICATION_ID` | Square application ID |
+| `SQUARE_LOCATION_ID` | Square location ID |
+
+### Required GitHub Variable
+
+| Variable | Value |
+|---|---|
+| `ANGULAR_API_BASE_URL` | `https://api.solnetlimo.com/api` |
 
 ---
 
 ## Pages
 
-### Public Website
-| Page | URL | Description |
-|------|-----|-------------|
-| Home | `/` | Hero, services preview, fleet preview, testimonials |
-| About | `/about` | Company story, values, team |
-| Services | `/services` | All 17 services displayed as cards |
-| Fleet | `/fleet` | All vehicles with details |
-| Booking | `/booking` | Full reservation form |
-| Contact | `/contact` | Contact form + info |
-| FAQ | `/faq` | Accordion FAQ |
+### Public
+
+| Page | URL |
+|---|---|
+| Home | `/` |
+| About | `/about` |
+| Services | `/services` |
+| Fleet | `/fleet` |
+| Booking | `/booking` |
+| Contact | `/contact` |
+| FAQ | `/faq` |
 
 ### Admin Portal
-| Page | URL | Description |
-|------|-----|-------------|
-| Login | `/admin/login` | Admin authentication |
-| Dashboard | `/admin/dashboard` | Stats + recent activity |
-| Bookings | `/admin/bookings` | Manage all bookings |
-| Messages | `/admin/messages` | View contact messages |
-| Services | `/admin/services-management` | Add/edit/delete services |
-| Fleet | `/admin/fleet-management` | Add/edit/delete vehicles |
 
----
-
-## API Endpoints
-
-```
-POST   /api/bookings           Create booking (public)
-GET    /api/bookings           List bookings (admin)
-GET    /api/bookings/stats     Booking stats (admin)
-GET    /api/bookings/:id       Get booking (admin)
-PATCH  /api/bookings/:id/status Update status (admin)
-DELETE /api/bookings/:id       Delete booking (admin)
-
-POST   /api/contact            Submit message (public)
-GET    /api/contact            List messages (admin)
-GET    /api/contact/stats      Message stats (admin)
-PATCH  /api/contact/:id/read   Mark read (admin)
-DELETE /api/contact/:id        Delete message (admin)
-
-GET    /api/services           List active services (public)
-GET    /api/services/admin     All services (admin)
-POST   /api/services           Create service (admin)
-PATCH  /api/services/:id       Update service (admin)
-DELETE /api/services/:id       Delete service (admin)
-
-GET    /api/fleet              List active vehicles (public)
-GET    /api/fleet/admin        All vehicles (admin)
-POST   /api/fleet              Add vehicle (admin)
-PATCH  /api/fleet/:id          Update vehicle (admin)
-DELETE /api/fleet/:id          Delete vehicle (admin)
-
-POST   /api/auth/login         Admin login
-GET    /api/auth/me            Get current admin (admin)
-```
-
----
-
-## Production Build
-
-```bash
-# Build Angular
-cd client && npm run build:prod
-
-# Set NODE_ENV=production in server/.env
-# Deploy dist/ folder to your hosting provider
-# Deploy server/ to your Node.js host
-```
+| Page | URL |
+|---|---|
+| Login | `/admin/login` |
+| Dashboard | `/admin/dashboard` |
+| Bookings | `/admin/bookings` |
+| Messages | `/admin/messages` |
+| Services | `/admin/services-management` |
+| Fleet | `/admin/fleet-management` |
+| Pricing | `/admin/pricing` |
 
 ---
 
@@ -166,4 +167,14 @@ cd client && npm run build:prod
 
 **Frontend:** Angular 18 · TypeScript · SCSS · Reactive Forms · Angular Router
 
-**Backend:** Node.js · Express.js · MongoDB · Mongoose · JWT · Bcrypt · Nodemailer
+**Backend:** Node.js · Express.js · MongoDB · Mongoose · JWT · Bcrypt · Nodemailer · Helmet · Axios
+
+**Payments:** Square Web Payments SDK (frontend tokenization) + Square REST API (backend charge)
+
+**Maps:** Google Maps JS API · Places Autocomplete · Distance Matrix · Geocoding
+
+**Deployment:** DigitalOcean · Nginx · PM2 · GitHub Actions
+
+---
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full server setup, Nginx config, SSL, and DNS instructions.

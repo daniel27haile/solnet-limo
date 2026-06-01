@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
 
@@ -57,7 +58,7 @@
     background: $color-error;
     color: $color-white;
 
-    &:hover { background: darken($color-error, 10%); }
+    &:hover { background: color.adjust($color-error, $lightness: -10%); }
   }
 
   &-sm {

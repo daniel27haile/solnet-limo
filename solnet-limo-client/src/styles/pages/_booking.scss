@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
 
@@ -16,13 +17,13 @@
   &-success {
     background: rgba($color-success, 0.1);
     border: 1px solid rgba($color-success, 0.3);
-    color: lighten($color-success, 20%);
+    color: color.adjust($color-success, $lightness: 20%);
   }
 
   &-error {
     background: rgba($color-error, 0.1);
     border: 1px solid rgba($color-error, 0.3);
-    color: lighten($color-error, 20%);
+    color: color.adjust($color-error, $lightness: 20%);
     flex-wrap: wrap;
     row-gap: $spacing-sm;
 

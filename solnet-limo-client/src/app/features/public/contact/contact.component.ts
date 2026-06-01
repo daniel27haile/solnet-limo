@@ -4,12 +4,11 @@ import { CommonModule } from '@angular/common';
 import { COMPANY } from '../../../core/constants/app.constants';
 import { ContactService } from '../../../core/services/contact.service';
 import { SectionTitleComponent } from '../../../shared/components/section-title/section-title.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SectionTitleComponent, LoadingSpinnerComponent],
+  imports: [ReactiveFormsModule, CommonModule, SectionTitleComponent],
   template: `
     <div class="page-hero">
       <div class="container">

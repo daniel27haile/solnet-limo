@@ -9,22 +9,37 @@
   min-height: 90vh;
   display: flex;
   align-items: center;
-  background-image: url('/assets/images/SUB.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   overflow: hidden;
+  // Black base prevents any gray/white flash while the image loads
+  background: #000;
 
-  // Overlay via ::before — single layer, light enough to show the vehicle
+  &__img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  // ── Gradient overlay — transparent at edges, darkens only behind text ────────
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0)    0%,
+      rgba(0, 0, 0, 0.25) 40%,
+      rgba(0, 0, 0, 0.45) 60%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
     z-index: 1;
   }
 
-  // Content sits above the overlay
+  // ── Content ─────────────────────────────────────────────────────────────────
   &__content {
     position: relative;
     z-index: 2;
@@ -38,57 +53,70 @@
     display: inline-flex;
     align-items: center;
     gap: $spacing-sm;
-    padding: 8px 20px;
-    background: rgba($color-gold, 0.1);
-    border: 1px solid rgba($color-gold, 0.4);
+    padding: 8px 22px;
+    background: rgba($color-gold, 0.12);
+    border: 1px solid rgba($color-gold, 0.5);
     border-radius: $radius-full;
-    font-size: 0.75rem;
-    font-weight: $font-weight-medium;
+    font-size: 0.72rem;
+    font-weight: $font-weight-semibold;
     color: $color-gold-light;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: $spacing-xl;
+    backdrop-filter: blur(12px);
 
     .dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       background: $color-success;
       border-radius: 50%;
+      box-shadow: 0 0 6px rgba($color-success, 0.8);
       animation: pulse 2s infinite;
     }
   }
 
   &__title {
     font-family: $font-serif;
-    font-size: clamp(2.2rem, 6vw, 5.5rem);
+    font-size: clamp(2.6rem, 7vw, 6rem);
     font-weight: $font-weight-bold;
     color: $color-white;
-    line-height: 1.1;
-    margin-bottom: $spacing-md;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: $spacing-lg;
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.9),
+      0 4px 24px rgba(0, 0, 0, 0.6);
 
-    .gold {
-      @include gold-gradient-text;
+    .gold { @include gold-gradient-text; }
+
+    &::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, $color-gold, transparent);
+      margin: $spacing-md auto 0;
     }
   }
 
   &__tagline {
     font-family: $font-serif;
-    font-size: clamp(0.95rem, 2.2vw, 1.4rem);
+    font-size: clamp(1rem, 2.4vw, 1.45rem);
     font-weight: $font-weight-light;
     color: $color-gold-light;
     font-style: italic;
+    margin-top: $spacing-md;
     margin-bottom: $spacing-sm;
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
   }
 
   &__slogan {
-    font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+    font-size: clamp(0.875rem, 1.5vw, 1.05rem);
     color: $color-silver;
-    max-width: 540px;
-    margin: 0 auto $spacing-xl;
-    line-height: 1.8;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+    max-width: 520px;
+    margin: 0 auto $spacing-xxl;
+    line-height: 1.9;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
   }
 
   &__actions {
@@ -118,10 +146,10 @@
     .material-icons { font-size: 1.25rem; }
   }
 
-  // Tablet
+  // ── Tablet (768px – 1024px) ──────────────────────────────────────────────────
+  // hero-tablet.jpg loaded via <source media="(min-width: 768px) and (max-width: 1024px)">
   @include max-md {
     min-height: 75vh;
-    background-position: center right;
 
     &__scroll { display: none; }
 
@@ -131,32 +159,85 @@
     }
   }
 
-  // Mobile
+  // ── Mobile (≤ 575px) — stacked layout ──────────────────────────────────────
+  // hero-mobile.jpg is a 640×900 portrait with a black studio backdrop at the
+  // top ~25%. Filling a full-height hero shows that black as "empty space".
+  //
+  // Fix: stack the layout — image block on top, content panel below.
+  // The container is landscape (wider than tall), so object-fit:cover scales
+  // by WIDTH, creating vertical room for object-position to crop the backdrop
+  // and frame the car body at the top.
   @include max-sm {
+    flex-direction: column;
+    align-items: stretch;
     min-height: auto;
-    background-position: center;
-    padding: 6rem 1rem 4rem;
+    padding: 0;
+    padding-top: $header-height;
 
+    // Overlay not needed — image block and content panel each handle their own bg
+    &::before { display: none; }
+
+    // Image becomes a static block at the top of the stack.
+    &__img {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      flex-shrink: 0;
+      object-position: center center;
+      z-index: auto;
+    }
+
+    // Solid black content panel below the image
     &__content {
-      padding-top: 0;
-      padding-bottom: 0;
+      position: static;
+      z-index: auto;
+      width: 100%;
+      background: #000;
+      border-top: 2px solid rgba($color-gold, 0.4);
+      padding: 2rem 1.5rem 3.5rem;
+      text-align: center;
     }
 
     &__badge {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       padding: 6px 14px;
-      margin-bottom: $spacing-lg;
+      margin-bottom: $spacing-md;
+    }
+
+    &__title {
+      font-size: clamp(2rem, 9vw, 2.6rem);
+      text-shadow: none;
+
+      &::after { margin-top: $spacing-sm; }
+    }
+
+    &__tagline {
+      font-size: 1rem;
+      text-shadow: none;
+    }
+
+    &__slogan {
+      font-size: 0.875rem;
+      text-shadow: none;
+      margin-bottom: $spacing-xl;
     }
 
     &__actions {
       flex-direction: column;
       align-items: center;
+      gap: $spacing-sm;
+      margin-bottom: 0;
 
       .btn {
         width: 100%;
-        max-width: 300px;
+        max-width: 320px;
+        justify-content: center;
       }
     }
+
+    &__scroll { display: none; }
   }
 }
 

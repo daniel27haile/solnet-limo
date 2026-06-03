@@ -18,6 +18,7 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { ProgressStepperComponent } from '../../../shared/components/progress-stepper/progress-stepper.component';
 import { PriceSummaryComponent } from '../../../shared/components/price-summary/price-summary.component';
+import { ReviewModalComponent } from '../../../shared/components/review-modal/review-modal.component';
 
 @Component({
   selector: 'app-booking',
@@ -26,6 +27,7 @@ import { PriceSummaryComponent } from '../../../shared/components/price-summary/
     ReactiveFormsModule, CommonModule,
     SectionTitleComponent, LoadingSpinnerComponent,
     ProgressStepperComponent, PriceSummaryComponent,
+    ReviewModalComponent,
   ],
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.scss'],
@@ -67,6 +69,9 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   // Confirmation
   confirmation  = signal<PaymentConfirmation | null>(null);
+
+  // Review modal
+  showReviewModal = signal(false);
 
   // Step-level errors
   stepError = signal('');
@@ -293,6 +298,7 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.confirmation.set(result);
         this.currentStep.set(4);
         this.submitting.set(false);
+        this.showReviewModal.set(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: (err) => {
@@ -345,6 +351,10 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   // ─── Getters for template ─────────────────────────────────────────────────
+
+  closeReviewModal(): void {
+    this.showReviewModal.set(false);
+  }
 
   get formValue() {
     return this.form.value;

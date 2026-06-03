@@ -115,10 +115,6 @@
   }
 
   .hamburger {
-    @include lg {
-      display: none;
-    }
-
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -126,6 +122,10 @@
     cursor: pointer;
     background: none;
     border: none;
+
+    @include lg {
+      display: none;
+    }
 
     span {
       display: block;

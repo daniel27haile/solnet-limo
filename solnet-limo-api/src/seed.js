@@ -28,7 +28,8 @@ const services = [
 const fleet = [
   {
     name: 'Premium Black SUV',
-    image: 'assets/images/fleet/black-suv.jpg',
+    slug: 'black-suv',
+    image: 'assets/images/fleet/black-suv/black-suv.jpg',
     passengers: 6,
     luggage: 6,
     description: 'Our flagship premium black SUV offers unmatched comfort and style for any occasion. Featuring leather seating, climate control, and premium amenities.',
@@ -37,7 +38,8 @@ const fleet = [
   },
   {
     name: 'Executive Stretch Limousine',
-    image: 'assets/images/fleet/stretch-limo.jpg',
+    slug: 'stretch-limo',
+    image: 'assets/images/fleet/stretch-limo/stretch-limo.jpg',
     passengers: 10,
     luggage: 6,
     description: 'The classic stretch limousine for weddings, proms, and special events. Luxury bar, ambient lighting, and premium entertainment system included.',
@@ -46,7 +48,8 @@ const fleet = [
   },
   {
     name: 'Luxury Sedan',
-    image: 'assets/images/fleet/luxury-sedan.jpg',
+    slug: 'luxury-sedan',
+    image: 'assets/images/fleet/luxury-sedan/luxury-sedan.jpg',
     passengers: 4,
     luggage: 4,
     description: 'Ideal for executive airport transfers and business travel. Discreet, comfortable, and professionally appointed.',
@@ -55,7 +58,9 @@ const fleet = [
   },
   {
     name: 'Luxury Van / Sprinter',
-    image: 'assets/images/fleet/luxury-van.jpg',
+    slug: 'luxury-van',
+    image: 'assets/images/fleet/luxury-van/luxury-van.jpg',
+    imageFit: 'contain',
     passengers: 14,
     luggage: 14,
     description: 'Perfect for group transportation, corporate events, and large parties. Spacious, comfortable, and professionally equipped.',

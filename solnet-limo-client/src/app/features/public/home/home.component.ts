@@ -4,8 +4,10 @@ import { CommonModule } from '@angular/common';
 import { COMPANY, PAYMENT_METHODS } from '../../../core/constants/app.constants';
 import { ServicesDataService } from '../../../core/services/services-data.service';
 import { FleetService } from '../../../core/services/fleet.service';
+import { ReviewService } from '../../../core/services/review.service';
 import { Service } from '../../../core/models/service.model';
 import { FleetVehicle, FALLBACK_FLEET } from '../../../core/models/fleet.model';
+import { PublicReview } from '../../../core/models/review.model';
 import { SectionTitleComponent } from '../../../shared/components/section-title/section-title.component';
 import { ServiceCardComponent } from '../../../shared/components/service-card/service-card.component';
 import { FleetCardComponent } from '../../../shared/components/fleet-card/fleet-card.component';
@@ -26,6 +28,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 export class HomeComponent implements OnInit {
   private servicesService = inject(ServicesDataService);
   private fleetService = inject(FleetService);
+  private reviewService = inject(ReviewService);
 
   company = COMPANY;
   paymentMethods = PAYMENT_METHODS;
@@ -42,7 +45,7 @@ export class HomeComponent implements OnInit {
     { icon: 'favorite', title: 'Unforgettable Experience', text: 'We don\'t just transport you — we create memories. Every ride is a premium, personalized experience.' },
   ];
 
-  testimonials: Testimonial[] = [
+  private readonly staticTestimonials: Testimonial[] = [
     { name: 'Jessica M.', location: 'Denver, CO', rating: 5, text: 'Solnet Limo made our wedding day absolutely perfect. The limo was stunning and our driver was incredibly professional.', service: 'Wedding' },
     { name: 'Marcus T.', location: 'Fort Collins, CO', rating: 5, text: 'Used them for airport pickup and drop-off. On time every single time. Will never use another service again!', service: 'Airport Transportation' },
     { name: 'Alicia R.', location: 'Boulder, CO', rating: 5, text: 'My daughter\'s prom night was made extra special thanks to Solnet Limo. She felt like a celebrity!', service: 'Prom' },
@@ -50,6 +53,8 @@ export class HomeComponent implements OnInit {
     { name: 'Sophia L.', location: 'Loveland, CO', rating: 5, text: 'Booked for our anniversary dinner. The whole evening was elevated. Truly felt like royalty. Thank you!', service: 'Anniversary' },
     { name: 'James B.', location: 'Windsor, CO', rating: 5, text: 'Fast response, great communication, and an amazing ride. Solnet Limo is the definition of elite service.', service: 'Birthday' },
   ];
+
+  testimonials = signal<Testimonial[]>(this.staticTestimonials);
 
   ngOnInit(): void {
     this.servicesService.getServices().subscribe({
@@ -70,5 +75,27 @@ export class HomeComponent implements OnInit {
         this.loadingFleet.set(false);
       },
     });
+
+    this.reviewService.getPublicReviews().subscribe({
+      next: (reviews) => {
+        const mapped = this.mapReviews(reviews);
+        if (mapped.length > 0) {
+          this.testimonials.set(mapped);
+        }
+      },
+      error: () => { /* keep static testimonials */ },
+    });
+  }
+
+  private mapReviews(reviews: PublicReview[]): Testimonial[] {
+    return reviews
+      .filter((r) => r.comment && r.comment.trim().length > 0)
+      .map((r) => ({
+        name:     r.customerName,
+        location: '',
+        rating:   r.rating,
+        text:     r.comment!,
+        service:  r.vehicleType || 'Booking',
+      }));
   }
 }

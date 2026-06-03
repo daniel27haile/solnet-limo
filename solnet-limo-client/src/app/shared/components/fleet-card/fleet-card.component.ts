@@ -8,13 +8,16 @@ import { FleetVehicle } from '../../../core/models/fleet.model';
   imports: [RouterLink],
   template: `
     <article class="card" role="article">
-      <img
-        [src]="vehicle.image"
-        [alt]="vehicle.name + ' - Solnet Limo'"
-        class="card__image"
-        loading="lazy"
-        (error)="onImageError($event)"
-      />
+      <div class="card__picture">
+        <img
+          [src]="vehicleImageUrl"
+          [alt]="vehicle.name + ' - Solnet Limo'"
+          class="card__image"
+          [style.object-fit]="vehicle.imageFit || 'cover'"
+          loading="eager"
+          (error)="onImageError($event)"
+        />
+      </div>
       <div class="card__body">
         <h3 class="card__title">{{ vehicle.name }}</h3>
         <div class="card__meta">
@@ -50,7 +53,18 @@ import { FleetVehicle } from '../../../core/models/fleet.model';
 export class FleetCardComponent {
   @Input({ required: true }) vehicle!: FleetVehicle;
 
+  private readonly defaultFallbackImage = 'assets/images/fleet/default-fleet.jpg';
+
+  get vehicleImageUrl(): string {
+    if (this.vehicle.slug) {
+      return `assets/images/fleet/${this.vehicle.slug}/${this.vehicle.slug}.jpg`;
+    }
+    return this.vehicle.image;
+  }
+
   onImageError(event: Event): void {
-    (event.target as HTMLImageElement).src = 'assets/images/fleet/default-vehicle.jpg';
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.onerror = null;
+    imgElement.src = this.defaultFallbackImage;
   }
 }

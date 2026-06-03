@@ -9,6 +9,7 @@ const adminNav = [
   { label: 'Services', path: '/admin/services-management', icon: 'room_service' },
   { label: 'Fleet', path: '/admin/fleet-management', icon: 'directions_car' },
   { label: 'Pricing', path: '/admin/pricing', icon: 'attach_money' },
+  { label: 'Reviews', path: '/admin/reviews', icon: 'star_rate' },
 ] as const;
 
 @Component({

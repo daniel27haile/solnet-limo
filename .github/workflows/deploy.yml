@@ -69,18 +69,37 @@ jobs:
       # ── SSH setup ────────────────────────────────────────────────────────────
 
       - name: Setup SSH
+        env:
+          DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DO_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+
+          if [ -z "$DO_HOST" ]; then
+            echo "ERROR: DO_HOST secret is missing"
+            exit 1
+          fi
+
+          echo "$DO_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p ${{ secrets.DO_PORT }} ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+
+          DO_PORT="${DO_PORT:-22}"
+          ssh-keyscan -H -p "$DO_PORT" "$DO_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       # ── Create remote folders ────────────────────────────────────────────────
 
       - name: Create deployment folders on server
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
-            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+          DO_PORT="${DO_PORT:-22}"
+          ssh -i ~/.ssh/deploy_key -p "$DO_PORT" \
+            "$DO_USER@$DO_HOST" \
             "sudo mkdir -p /var/www/solnet-limo/solnet-limo-client && \
              sudo mkdir -p /var/www/solnet-limo/solnet-limo-api && \
              sudo chown -R \$USER:\$USER /var/www/solnet-limo"
@@ -90,32 +109,47 @@ jobs:
       # We deploy that browser/ folder contents directly to the server path.
 
       - name: Deploy frontend build
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
+          DO_PORT="${DO_PORT:-22}"
           rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }}" \
+            -e "ssh -i ~/.ssh/deploy_key -p $DO_PORT" \
             solnet-limo-client/dist/solnet-limo/browser/ \
-            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/solnet-limo/solnet-limo-client/
+            "$DO_USER@$DO_HOST":/var/www/solnet-limo/solnet-limo-client/
 
       # ── Deploy backend ───────────────────────────────────────────────────────
       # .env is excluded — the production .env lives on the server and is never overwritten.
 
       - name: Deploy backend source
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
+          DO_PORT="${DO_PORT:-22}"
           rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }}" \
+            -e "ssh -i ~/.ssh/deploy_key -p $DO_PORT" \
             --exclude node_modules \
             --exclude .env \
             --exclude .git \
             --exclude logs \
             solnet-limo-api/ \
-            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/solnet-limo/solnet-limo-api/
+            "$DO_USER@$DO_HOST":/var/www/solnet-limo/solnet-limo-api/
 
       # ── Install deps and restart PM2 ─────────────────────────────────────────
 
       - name: Install backend production dependencies and restart PM2
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
-            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+          DO_PORT="${DO_PORT:-22}"
+          ssh -i ~/.ssh/deploy_key -p "$DO_PORT" \
+            "$DO_USER@$DO_HOST" \
             "cd /var/www/solnet-limo/solnet-limo-api && \
              npm ci --omit=dev && \
              if pm2 describe solnet-limo-api > /dev/null 2>&1; then \
@@ -128,7 +162,12 @@ jobs:
       # ── Reload Nginx ─────────────────────────────────────────────────────────
 
       - name: Reload Nginx
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p ${{ secrets.DO_PORT }} \
-            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+          DO_PORT="${DO_PORT:-22}"
+          ssh -i ~/.ssh/deploy_key -p "$DO_PORT" \
+            "$DO_USER@$DO_HOST" \
             "sudo nginx -t && sudo systemctl reload nginx"

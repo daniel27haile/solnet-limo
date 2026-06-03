@@ -11,7 +11,7 @@ import { NAV_LINKS, COMPANY } from '../../../core/constants/app.constants';
     <header class="site-header" [class.scrolled]="scrolled()">
       <a routerLink="/" class="header-brand" aria-label="Solnet Limo Home">
         <div class="brand-text">
-          <span class="brand-name">Solnet Limo</span>
+          <span class="brand-name">Solnet Limo LLC</span>
           <span class="brand-tagline">Elite Transportation</span>
         </div>
       </a>

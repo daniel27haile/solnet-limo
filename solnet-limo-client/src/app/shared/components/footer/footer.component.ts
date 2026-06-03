@@ -13,7 +13,7 @@ import { COMPANY, PAYMENT_METHODS, SERVICE_TYPES } from '../../../core/constants
         <!-- Brand column -->
         <div class="site-footer__brand">
           <div class="brand-name">Solnet Limo</div>
-          <div class="brand-tagline">Elite Transportation Service by Solomon</div>
+          <div class="brand-tagline">{{ company.tagline }}</div>
           <p>{{ company.slogan }}</p>
           <div class="contact-list">
             <a [href]="company.phoneHref" aria-label="Call us">

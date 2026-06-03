@@ -1,12 +1,21 @@
 <!-- HERO SECTION -->
 <section class="hero" aria-label="Hero section">
+
+  <!-- Responsive hero image — art-directed with explicit breakpoint ranges -->
+  <img
+    src="assets/images/hero/hero.jpg"
+    alt="Luxury limousine transportation service – Solnet Limo"
+    class="hero__img"
+    loading="eager"
+  />
+
   <div class="hero__content">
     <div class="hero__badge">
       <span class="dot" aria-hidden="true"></span>
       Available 24/7 &bull; Professional &bull; Reliable
     </div>
     <h1 class="hero__title">
-      <span class="gold">Solnet</span> Limo
+      <span class="gold">Solnet</span> Limo 
     </h1>
     <p class="hero__tagline">{{ company.tagline }}</p>
     <p class="hero__slogan">{{ company.slogan }}</p>
@@ -132,7 +141,7 @@
       highlight="Clients Say"
       [centered]="true"
     />
-    <app-testimonials-carousel [testimonials]="testimonials" />
+    <app-testimonials-carousel [testimonials]="testimonials()" />
   </div>
 </section>
 

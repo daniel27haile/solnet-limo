@@ -2,7 +2,7 @@ import { ServiceType, PaymentMethod } from '../models/booking.model';
 
 export const COMPANY = {
   name: 'Solnet Limo',
-  tagline: 'Elite Transportation Service by Solomon',
+  tagline: 'Elite Transportation Service',
   slogan: 'Create an Elegant Impression & a Memory for the Lifetime!',
   phone: '970-473-1479',
   phoneHref: 'tel:9704731479',

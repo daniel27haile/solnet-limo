@@ -11,10 +11,17 @@ const app = express();
 app.use(helmet());
 
 // CORS — allows all origins listed in CLIENT_ORIGINS (supports www + non-www)
+// In development, any localhost origin is allowed regardless of port.
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (env.CLIENT_ORIGINS.includes(origin)) return true;
+  if (env.NODE_ENV === 'development' && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
+  return false;
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow server-to-server requests (no origin) and listed origins
-    if (!origin || env.CLIENT_ORIGINS.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`CORS: origin '${origin}' not allowed`));
@@ -43,6 +50,7 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/maps', require('./routes/maps.routes'));
 app.use('/api/pricing', require('./routes/pricing.routes'));
 app.use('/api/payments', require('./routes/payment.routes'));
+app.use('/api/reviews', require('./routes/review.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

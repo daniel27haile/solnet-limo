@@ -111,6 +111,12 @@ export const routes: Routes = [
             title: 'Pricing | Solnet Limo Admin',
           },
           {
+            path: 'reviews',
+            loadComponent: () =>
+              import('./features/admin/reviews/reviews.component').then((m) => m.ReviewsComponent),
+            title: 'Reviews | Solnet Limo Admin',
+          },
+          {
             path: '',
             redirectTo: 'dashboard',
             pathMatch: 'full',

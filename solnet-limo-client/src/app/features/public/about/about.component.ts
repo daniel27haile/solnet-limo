@@ -11,7 +11,7 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
     <!-- Page Hero -->
     <div class="page-hero">
       <div class="container">
-        <h1>About <span>Solnet Limo</span></h1>
+        <h1>About <span>Solnet Limo LLC</span></h1>
         <p>{{ company.tagline }}</p>
       </div>
     </div>
@@ -22,7 +22,7 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
         <div class="about-grid">
           <div class="about-image">
             <img
-              src="assets/images/about/chauffeur.jpg"
+              src="assets/images/about/about-image.jpg"
               alt="Professional Solnet Limo chauffeur in front of luxury black SUV"
               loading="lazy"
               (error)="onImageError($event)"
@@ -39,7 +39,7 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
             <app-section-title
               subtitle="Our Story"
               title="Elite Transportation "
-              highlight="by Solomon"
+              highlight="by Solnet Limo LLC"
               description="Solnet Limo was founded with one mission: to deliver an elite transportation experience that creates lasting impressions and memories."
             />
             <p>We believe every ride should feel extraordinary. Whether you are heading to a wedding, the airport, a prom, or simply a night out — you deserve to arrive in style, comfort, and confidence.</p>
@@ -188,6 +188,8 @@ export class AboutComponent {
   ];
 
   onImageError(event: Event): void {
-    (event.target as HTMLImageElement).src = 'assets/images/about/chauffeur-placeholder.jpg';
+    const img = event.target as HTMLImageElement;
+    img.onerror = null;
+    img.style.display = 'none';
   }
 }

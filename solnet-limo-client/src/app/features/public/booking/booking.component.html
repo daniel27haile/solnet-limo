@@ -541,3 +541,13 @@
     }
   </div>
 </section>
+
+@if (showReviewModal() && confirmation()) {
+  <app-review-modal
+    [bookingId]="confirmation()!.bookingId"
+    [customerName]="formValue.fullName ?? ''"
+    [customerEmail]="formValue.email ?? ''"
+    [vehicleType]="formValue.vehicleType ?? ''"
+    (closed)="closeReviewModal()"
+  />
+}

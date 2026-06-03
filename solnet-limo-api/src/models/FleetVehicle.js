@@ -8,9 +8,18 @@ const fleetVehicleSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, 'Name cannot exceed 100 characters'],
     },
+    slug: {
+      type: String,
+      trim: true,
+    },
     image: {
       type: String,
-      default: 'assets/images/fleet/default-vehicle.jpg',
+      default: 'assets/images/fleet/default-fleet.jpg',
+    },
+    imageFit: {
+      type: String,
+      enum: ['cover', 'contain'],
+      default: 'cover',
     },
     passengers: {
       type: Number,

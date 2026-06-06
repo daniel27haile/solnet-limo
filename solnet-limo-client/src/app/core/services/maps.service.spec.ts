@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MapsService } from './maps.service';
+import { environment } from '../../../environments/environment';
 
 // ---------------------------------------------------------------------------
 // Local types for Google Maps mock objects.
@@ -55,10 +56,19 @@ describe('MapsService', () => {
 
   describe('loadMapsApi()', () => {
     it('rejects when googleMapsBrowserKey is not configured', async () => {
-      // environment.googleMapsBrowserKey defaults to '' in the dev environment.
+      // Temporarily clear the key to exercise the "no key" guard in loadMapsApi().
+      const savedKey = environment.googleMapsBrowserKey;
+      (environment as any).googleMapsBrowserKey = '';
+      // Reset the service's singleton load state so it re-evaluates the key check.
+      (service as any).loaded = false;
+      (service as any).loadPromise = null;
+
       await expectAsync(service.loadMapsApi()).toBeRejectedWithError(
         'Google Maps API key is not configured.'
       );
+
+      // Restore the real key so later tests are unaffected.
+      (environment as any).googleMapsBrowserKey = savedKey;
     });
 
     it('returns the identical Promise on subsequent calls (singleton guard)', () => {

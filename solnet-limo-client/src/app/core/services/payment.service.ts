@@ -51,6 +51,10 @@ export class PaymentService {
       throw new Error('Square App ID is not configured. Please set it in environment.ts.');
     }
 
+    if (!document.getElementById(containerId)) {
+      throw new Error(`Payment container #${containerId} was not found in the DOM.`);
+    }
+
     const payments = Square.payments(environment.squareAppId, environment.squareLocationId);
     this.squareCard = await payments.card();
     await this.squareCard.attach(`#${containerId}`);

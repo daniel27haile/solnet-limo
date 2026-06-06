@@ -8,25 +8,27 @@ const env = require('./config/env');
 const app = express();
 
 // Security headers
-app.use(helmet());
+// In development, relax Helmet policies that block cross-origin API calls from
+// the Angular dev server (localhost:4200 → localhost:3001):
+//   - crossOriginResourcePolicy: 'same-origin' blocks withFetch() cross-origin reads
+//   - contentSecurityPolicy: 'upgrade-insecure-requests' breaks HTTP-only dev URLs
+// Production keeps full Helmet defaults.
+if (env.NODE_ENV === 'production') {
+  app.use(helmet());
+} else {
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false,
+  }));
+}
 
-// CORS — allows all origins listed in CLIENT_ORIGINS (supports www + non-www)
-// In development, any localhost origin is allowed regardless of port.
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-  if (env.CLIENT_ORIGINS.includes(origin)) return true;
-  if (env.NODE_ENV === 'development' && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
-  return false;
-};
+// CORS — dev: localhost only; prod: production origins from CLIENT_ORIGINS env var
+const allowedOrigins = env.NODE_ENV === 'production'
+  ? env.CLIENT_ORIGINS
+  : ['http://localhost:4200', 'http://127.0.0.1:4200'];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: origin '${origin}' not allowed`));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

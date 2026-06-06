@@ -3,6 +3,7 @@ import {
   inject, signal, ChangeDetectorRef,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { COMPANY, SERVICE_TYPES } from '../../../core/constants/app.constants';
@@ -81,6 +82,7 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Track whether we've initialized autocomplete for the current DOM state
   private autocompleteInitialized = false;
   private lastRenderedStep = -1;
+  private pickupSub?: Subscription;
 
   form = this.fb.group({
     // Step 1: Trip Info
@@ -118,6 +120,13 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.applyQueryParams();
       },
     });
+
+    // Clear the geolocation error as soon as the user types a manual pickup address
+    this.pickupSub = this.form.get('pickupLocation')!.valueChanges.subscribe((val) => {
+      if (val && this.locationError()) {
+        this.locationError.set('');
+      }
+    });
   }
 
   ngAfterViewChecked(): void {
@@ -134,6 +143,7 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnDestroy(): void {
     this.paymentService.destroyCard().catch(() => {});
+    this.pickupSub?.unsubscribe();
   }
 
   private applyQueryParams(): void {
@@ -249,9 +259,15 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.loadingPrice.set(false);
       },
       error: (err) => {
-        this.priceError.set(
-          err?.error?.message || 'Could not calculate price. Check the addresses or try again.'
-        );
+        if (err.status === 0) {
+          this.priceError.set(
+            'Cannot reach the server. Make sure the backend is running on port 3001, then click Retry.'
+          );
+        } else {
+          this.priceError.set(
+            err?.error?.message || 'Could not calculate price. Please check the addresses and try again.'
+          );
+        }
         this.loadingPrice.set(false);
       },
     });
@@ -266,6 +282,10 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
   private initPaymentForm(): void {
     this.squareReady.set(false);
     this.squareError.set('');
+
+    // Flush Angular's pending changes so #card-container is in the DOM
+    // before Square tries to attach to it.
+    this.cdr.detectChanges();
 
     this.paymentService.loadSquareSdk()
       .then(() => this.paymentService.initCard('card-container'))

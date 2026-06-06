@@ -87,7 +87,11 @@
       0 2px 4px rgba(0, 0, 0, 0.9),
       0 4px 24px rgba(0, 0, 0, 0.6);
 
-    .gold { @include gold-gradient-text; }
+    .gold {
+      @include gold-gradient-text;
+      display: inline-block;  // needed for background-clip: text to render reliably
+      text-shadow: none;      // dark inherited shadow washes out the gradient fill
+    }
 
     &::after {
       content: '';

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ServicesDataService } from '../../../core/services/services-data.service';
@@ -21,6 +21,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
           {{ showForm() ? 'Cancel' : 'Add Service' }}
         </button>
       </div>
+
+      @if (successMsg()) {
+        <div class="alert alert-success" role="alert">{{ successMsg() }}</div>
+      }
+      @if (errorMsg()) {
+        <div class="alert alert-error" role="alert">{{ errorMsg() }}</div>
+      }
 
       @if (showForm()) {
         <div class="form-card" style="margin-bottom:32px;">
@@ -96,15 +103,18 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     </div>
   `,
 })
-export class ServicesManagementComponent implements OnInit {
+export class ServicesManagementComponent implements OnInit, OnDestroy {
   private svc = inject(ServicesDataService);
   private fb = inject(FormBuilder);
 
-  services = signal<Service[]>([]);
-  loading = signal(true);
-  saving = signal(false);
-  showForm = signal(false);
+  services  = signal<Service[]>([]);
+  loading   = signal(true);
+  saving    = signal(false);
+  showForm  = signal(false);
   editingId = signal<string | null>(null);
+  successMsg = signal('');
+  errorMsg   = signal('');
+  private msgTimer?: ReturnType<typeof setTimeout>;
 
   form = this.fb.group({
     title:       ['', Validators.required],
@@ -138,6 +148,7 @@ export class ServicesManagementComponent implements OnInit {
       ? this.svc.updateService(this.editingId()!, this.form.value as any)
       : this.svc.createService(this.form.value as any);
 
+    const wasEditing = !!this.editingId();
     obs.subscribe({
       next: () => {
         this.saving.set(false);
@@ -145,9 +156,29 @@ export class ServicesManagementComponent implements OnInit {
         this.editingId.set(null);
         this.form.reset({ icon: 'directions_car' });
         this.ngOnInit();
+        this.showMsg('successMsg', wasEditing ? 'Service updated.' : 'Service added successfully.');
       },
-      error: () => this.saving.set(false),
+      error: (err) => {
+        this.saving.set(false);
+        this.showMsg('errorMsg', err?.error?.message || 'Failed to save. Please try again.');
+      },
     });
+  }
+
+  private showMsg(type: 'successMsg' | 'errorMsg', text: string): void {
+    this.successMsg.set('');
+    this.errorMsg.set('');
+    clearTimeout(this.msgTimer);
+    if (type === 'successMsg') {
+      this.successMsg.set(text);
+    } else {
+      this.errorMsg.set(text);
+    }
+    this.msgTimer = setTimeout(() => { this.successMsg.set(''); this.errorMsg.set(''); }, 4000);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.msgTimer);
   }
 
   toggleForm(): void {

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { COMPANY } from '../../../core/constants/app.constants';
@@ -194,7 +194,8 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
     }
   `],
 })
-export class ContactComponent {
+export class ContactComponent implements OnDestroy {
+  private successTimer?: ReturnType<typeof setTimeout>;
   private fb = inject(FormBuilder);
   private contactService = inject(ContactService);
   company = COMPANY;
@@ -229,11 +230,17 @@ export class ContactComponent {
         this.success.set(true);
         this.form.reset();
         this.submitting.set(false);
+        clearTimeout(this.successTimer);
+        this.successTimer = setTimeout(() => this.success.set(false), 4000);
       },
       error: (err) => {
         this.errorMsg.set(err?.error?.message || 'Failed to send. Please call us directly.');
         this.submitting.set(false);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.successTimer);
   }
 }

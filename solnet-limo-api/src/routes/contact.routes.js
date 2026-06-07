@@ -17,6 +17,7 @@ router.get('/', protect, ctrl.getAllMessages);
 router.get('/stats', protect, ctrl.getMessageStats);
 router.get('/:id', protect, ctrl.getMessageById);
 router.patch('/:id/read', protect, ctrl.markAsRead);
+router.post('/:id/reply', protect, ctrl.replyToMessage);
 router.delete('/:id', protect, ctrl.deleteMessage);
 
 module.exports = router;

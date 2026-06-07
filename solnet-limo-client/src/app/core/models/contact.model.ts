@@ -6,6 +6,8 @@ export interface ContactMessage {
   subject: string;
   message: string;
   isRead: boolean;
+  isReplied?: boolean;
+  repliedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

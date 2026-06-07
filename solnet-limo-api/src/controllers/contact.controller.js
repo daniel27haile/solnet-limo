@@ -39,3 +39,27 @@ exports.getMessageStats = asyncHandler(async (req, res) => {
   const stats = await contactService.getMessageStats();
   success(res, stats);
 });
+
+exports.replyToMessage = asyncHandler(async (req, res) => {
+  const { replyBody } = req.body;
+  if (!replyBody || !replyBody.trim()) {
+    return error(res, 'Reply message is required', 400);
+  }
+
+  const message = await contactService.getMessageById(req.params.id);
+  if (!message) return error(res, 'Message not found', 404);
+
+  try {
+    await emailService.sendCustomerReplyEmail({
+      to: message.email,
+      customerName: message.name,
+      originalSubject: message.subject,
+      replyBody: replyBody.trim(),
+    });
+  } catch (err) {
+    return error(res, 'Failed to send reply email. Please try again.', 502);
+  }
+
+  const updated = await contactService.markAsReplied(req.params.id);
+  success(res, updated, 'Reply sent successfully');
+});

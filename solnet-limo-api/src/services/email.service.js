@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const env = require('../config/env');
+const { contactNotificationHtml, contactNotificationText, customerReplyHtml, customerReplyText } = require('../utils/emailTemplates');
 
 const createTransporter = () => {
   if (!env.EMAIL_HOST || !env.EMAIL_USER || !env.EMAIL_PASS) {
@@ -10,7 +11,7 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host: env.EMAIL_HOST,
     port: env.EMAIL_PORT,
-    secure: env.EMAIL_PORT === 465,
+    secure: false, // STARTTLS on port 587 — do not use SSL
     auth: {
       user: env.EMAIL_USER,
       pass: env.EMAIL_PASS,
@@ -24,6 +25,7 @@ const sendBookingConfirmation = async (booking) => {
 
   const customerMail = {
     from: `"Solnet Limo" <${env.EMAIL_USER}>`,
+    replyTo: env.EMAIL_USER,
     to: booking.email,
     subject: 'Booking Confirmation - Solnet Limo',
     html: `
@@ -51,7 +53,8 @@ const sendBookingConfirmation = async (booking) => {
   };
 
   const adminMail = {
-    from: `"Solnet Limo System" <${env.EMAIL_USER}>`,
+    from: `"${env.EMAIL_FROM_NAME}" <${env.EMAIL_USER}>`,
+    replyTo: booking.email,
     to: env.ADMIN_NOTIFICATION_EMAIL,
     subject: `New Booking Request - ${booking.fullName} (${booking.serviceType})`,
     html: `
@@ -87,20 +90,29 @@ const sendContactNotification = async (message) => {
   const transporter = createTransporter();
   if (!transporter) return;
 
+  const name      = message.name  || 'Website Contact';
+  const phone     = message.phone || 'Not provided';
+  const submitted = new Date().toLocaleString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long',
+    day: 'numeric', hour: 'numeric', minute: '2-digit',
+  });
+
+  const templateData = {
+    name,
+    email:     message.email,
+    phone,
+    subject:   message.subject,
+    message:   message.message,
+    submitted,
+  };
+
   const adminMail = {
-    from: `"Solnet Limo System" <${env.EMAIL_USER}>`,
-    to: env.ADMIN_NOTIFICATION_EMAIL,
-    subject: `New Contact Message - ${message.subject}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px;">
-        <h2 style="color: #c9a84c;">New Contact Message</h2>
-        <p><strong>From:</strong> ${message.name} (${message.email})</p>
-        <p><strong>Phone:</strong> ${message.phone || 'Not provided'}</p>
-        <p><strong>Subject:</strong> ${message.subject}</p>
-        <p><strong>Message:</strong></p>
-        <p style="background: #f5f5f5; padding: 15px; border-radius: 5px;">${message.message}</p>
-      </div>
-    `,
+    from:    `"${env.EMAIL_FROM_NAME}" <${env.EMAIL_USER}>`,
+    replyTo: `"${name}" <${message.email}>`,
+    to:      env.ADMIN_NOTIFICATION_EMAIL,
+    subject: 'Solnet Limo',
+    html:    contactNotificationHtml(templateData),
+    text:    contactNotificationText(templateData),
   };
 
   try {
@@ -110,4 +122,26 @@ const sendContactNotification = async (message) => {
   }
 };
 
-module.exports = { sendBookingConfirmation, sendContactNotification };
+const sendCustomerReplyEmail = async ({ to, customerName, originalSubject, replyBody }) => {
+  const transporter = createTransporter();
+  if (!transporter) return;
+
+  const templateData = { customerName, replyBody, originalSubject };
+
+  const mail = {
+    from:    `"Solnet Limo" <${env.EMAIL_USER}>`,
+    to,
+    subject: `Re: ${originalSubject}`,
+    html:    customerReplyHtml(templateData),
+    text:    customerReplyText(templateData),
+  };
+
+  try {
+    await transporter.sendMail(mail);
+  } catch (err) {
+    console.error('Customer reply email failed:', err.message);
+    throw err; // re-throw so controller can return 502
+  }
+};
+
+module.exports = { sendBookingConfirmation, sendContactNotification, sendCustomerReplyEmail };

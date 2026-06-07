@@ -87,62 +87,33 @@
                 subtitle="Step 1 of 4"
                 title="Trip "
                 highlight="Information"
-                description="Tell us where you're going. Use your current location or enter an address manually."
+                description="Enter your pickup and destination addresses to get started."
               />
 
               <form [formGroup]="form" novalidate>
 
-                <!-- Pickup with location option -->
+                <!-- Pickup -->
                 <div class="form-group">
-                  <label for="pickupLocation">Pickup Location *</label>
-                  <div class="location-field">
-                    <input
-                      id="pickupLocation"
-                      type="text"
-                      formControlName="pickupLocation"
-                      placeholder="Enter pickup address"
-                      autocomplete="off"
-                      [class.ng-invalid]="isInvalid('pickupLocation')"
-                      [class.ng-touched]="field('pickupLocation').touched"
-                    />
-                    <button
-                      type="button"
-                      class="btn-location"
-                      (click)="useCurrentLocation()"
-                      [disabled]="locating()"
-                      title="Use current location"
-                      aria-label="Use current location"
-                    >
-                      @if (locating()) {
-                        <app-loading-spinner />
-                      } @else {
-                        <span class="material-icons">my_location</span>
-                      }
-                    </button>
-                  </div>
-                  @if (locationError()) {
-                    <span class="field-error" role="alert">{{ locationError() }}</span>
-                  }
-                  @if (isInvalid('pickupLocation')) {
-                    <span class="field-error" role="alert">Pickup location is required</span>
-                  }
+                  <app-address-autocomplete
+                    label="Pickup Location *"
+                    placeholder="Enter pickup address"
+                    inputId="pickupLocation"
+                    errorMessage="Pickup location is required"
+                    [control]="field('pickupLocation')"
+                    (placeSelected)="onPickupSelected($event)"
+                  />
                 </div>
 
                 <!-- Drop-off -->
                 <div class="form-group">
-                  <label for="dropoffLocation">Drop-off Location *</label>
-                  <input
-                    id="dropoffLocation"
-                    type="text"
-                    formControlName="dropoffLocation"
+                  <app-address-autocomplete
+                    label="Drop-off Location *"
                     placeholder="Enter drop-off address"
-                    autocomplete="off"
-                    [class.ng-invalid]="isInvalid('dropoffLocation')"
-                    [class.ng-touched]="field('dropoffLocation').touched"
+                    inputId="dropoffLocation"
+                    errorMessage="Drop-off location is required"
+                    [control]="field('dropoffLocation')"
+                    (placeSelected)="onDropoffSelected($event)"
                   />
-                  @if (isInvalid('dropoffLocation')) {
-                    <span class="field-error" role="alert">Drop-off location is required</span>
-                  }
                 </div>
 
                 <!-- Service Type + Vehicle Type -->

@@ -335,31 +335,77 @@
   background: $color-dark-gray;
   border-top: 1px solid $border-color;
   border-bottom: 1px solid $border-color;
-  padding: $spacing-xl 0;
+  padding: $spacing-xxl 0;
+}
 
-  .payment-grid {
+.payment-groups {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+  margin-top: $spacing-xxl;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.payment-group {
+  background: $color-mid-gray;
+  border: 1px solid rgba($color-gold, 0.25);
+  border-radius: $radius-md;
+  padding: $spacing-xl;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($color-gold, 0.5);
+    box-shadow: 0 4px 24px rgba($color-gold, 0.06);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid rgba($color-gold, 0.15);
+
+    .material-icons {
+      font-size: 1.5rem;
+      color: $color-gold;
+    }
+
+    span:last-child {
+      font-family: $font-sans;
+      font-size: 0.8rem;
+      font-weight: $font-weight-semibold;
+      color: $color-gold-light;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  }
+
+  &__methods {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: $spacing-md;
-    margin-top: $spacing-xl;
+    gap: $spacing-sm;
+  }
+}
 
-    .payment-item {
-      padding: 12px 24px;
-      background: $color-mid-gray;
-      border: 1px solid rgba($color-gold, 0.2);
-      border-radius: $radius-sm;
-      font-size: 0.875rem;
-      font-weight: $font-weight-semibold;
-      color: $color-silver;
-      letter-spacing: 0.04em;
-      transition: $transition-fast;
+.payment-method {
+  padding: 8px 18px;
+  background: $color-dark-gray;
+  border: 1px solid rgba($color-gold, 0.2);
+  border-radius: $radius-full;
+  font-size: 0.875rem;
+  font-weight: $font-weight-semibold;
+  color: $color-silver;
+  letter-spacing: 0.03em;
+  transition: $transition-fast;
 
-      &:hover {
-        border-color: $color-gold;
-        color: $color-gold;
-      }
-    }
+  &:hover {
+    border-color: $color-gold;
+    color: $color-gold;
+    background: rgba($color-gold, 0.06);
   }
 }
 

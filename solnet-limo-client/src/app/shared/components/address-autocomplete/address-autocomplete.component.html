@@ -1,0 +1,70 @@
+<div class="autocomplete-wrapper">
+  @if (label) {
+    <label [for]="inputId">{{ label }}</label>
+  }
+
+  <div class="autocomplete-field" [class.is-open]="isOpen()">
+    <input
+      [id]="inputId"
+      type="text"
+      [formControl]="$any(control)"
+      [placeholder]="placeholder"
+      autocomplete="off"
+      role="combobox"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-activedescendant]="activeIndex() >= 0 ? (inputId + '-option-' + activeIndex()) : null"
+      [class.ng-invalid]="isInvalid"
+      [class.ng-touched]="control.touched"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+      (focus)="onFocus()"
+    />
+
+    @if (isLoading()) {
+      <span class="autocomplete-spinner" aria-hidden="true"></span>
+    }
+  </div>
+
+  @if (isOpen()) {
+    <ul
+      class="autocomplete-dropdown"
+      role="listbox"
+      [attr.aria-label]="label + ' suggestions'"
+    >
+      @if (noResults()) {
+        <li class="autocomplete-dropdown__empty" role="option" aria-disabled="true">
+          No matching addresses found. Try a street name, city, or ZIP code.
+        </li>
+      }
+      @for (prediction of predictions(); track prediction.placeId; let i = $index) {
+        <li
+          class="autocomplete-dropdown__item"
+          [class.is-active]="activeIndex() === i"
+          [id]="inputId + '-option-' + i"
+          role="option"
+          [attr.aria-selected]="activeIndex() === i"
+          (mousedown)="onPredictionMousedown($event, prediction)"
+        >
+          <span class="material-icons autocomplete-dropdown__icon" aria-hidden="true">location_on</span>
+          <span class="autocomplete-dropdown__text">
+            <span class="autocomplete-dropdown__main">{{ prediction.mainText }}</span>
+            @if (prediction.secondaryText) {
+              <span class="autocomplete-dropdown__secondary">{{ prediction.secondaryText }}</span>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (apiError()) {
+    <span class="field-error api-error" role="alert">{{ apiError() }}</span>
+  }
+
+  @if (isInvalid && !apiError()) {
+    <span class="field-error" role="alert">
+      {{ errorMessage || label + ' is required' }}
+    </span>
+  }
+</div>

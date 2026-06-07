@@ -36,6 +36,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   @if (!m.isRead) {
                     <span class="badge badge-pending">Unread</span>
                   }
+                  @if (m.isReplied) {
+                    <span class="badge badge-replied">Replied</span>
+                  }
                 </div>
               </div>
               <div style="margin:8px 0;">
@@ -49,11 +52,40 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                     Mark Read
                   </button>
                 }
+                @if (!m.isReplied) {
+                  <button class="btn-reply" (click)="openReply(m._id)" aria-label="Reply to customer">
+                    <span class="material-icons" aria-hidden="true">reply</span>
+                    Reply
+                  </button>
+                }
                 <button class="btn-delete" (click)="deleteMessage(m._id)" aria-label="Delete message">
                   <span class="material-icons" aria-hidden="true">delete</span>
                   Delete
                 </button>
               </div>
+
+              @if (replyingTo() === m._id) {
+                <div class="reply-compose">
+                  <textarea
+                    class="reply-textarea"
+                    placeholder="Write your reply to {{ m.name }}..."
+                    rows="5"
+                    [disabled]="replying()"
+                    (input)="replyText.set($any($event.target).value)">{{ replyText() }}</textarea>
+                  @if (replyError()) {
+                    <p class="reply-error">{{ replyError() }}</p>
+                  }
+                  <div class="reply-actions">
+                    <button class="btn-send" [disabled]="replying() || !replyText().trim()" (click)="sendReply(m)">
+                      <span class="material-icons" aria-hidden="true">send</span>
+                      {{ replying() ? 'Sending...' : 'Send Reply' }}
+                    </button>
+                    <button class="btn-cancel-reply" [disabled]="replying()" (click)="cancelReply()">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           }
         </div>
@@ -83,12 +115,117 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       gap: 8px;
       margin-bottom: 8px;
     }
+
+    .badge-replied {
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.3);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .btn-reply {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 6px;
+      background: transparent;
+      color: #c9a84c;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+
+      &:hover { background: rgba(201,168,76,0.1); border-color: #c9a84c; }
+
+      .material-icons { font-size: 16px; }
+    }
+
+    .reply-compose {
+      margin-top: 16px;
+      border-top: 1px solid rgba(201,168,76,0.2);
+      padding-top: 16px;
+    }
+
+    .reply-textarea {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      padding: 12px 14px;
+      resize: vertical;
+      box-sizing: border-box;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus { border-color: #c9a84c; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    .reply-error {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin: 8px 0 0;
+    }
+
+    .reply-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-send {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: #c9a84c;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+      &:not(:disabled):hover { opacity: 0.85; }
+
+      .material-icons { font-size: 16px; }
+    }
+
+    .btn-cancel-reply {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #888;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+      &:not(:disabled):hover { border-color: #666; color: #bbb; }
+    }
   `],
 })
 export class MessagesComponent implements OnInit {
   private contactService = inject(ContactService);
   messages = signal<ContactMessage[]>([]);
   loading = signal(true);
+  replyingTo = signal<string | null>(null);
+  replyText = signal('');
+  replying = signal(false);
+  replyError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.contactService.getMessages({ page: 1, limit: 50 }).subscribe({
@@ -115,6 +252,41 @@ export class MessagesComponent implements OnInit {
     this.contactService.deleteMessage(id).subscribe({
       next: () => {
         this.messages.update((list) => list.filter((m) => m._id !== id));
+      },
+    });
+  }
+
+  openReply(id: string): void {
+    this.replyingTo.set(id);
+    this.replyText.set('');
+    this.replyError.set(null);
+  }
+
+  cancelReply(): void {
+    this.replyingTo.set(null);
+    this.replyText.set('');
+    this.replyError.set(null);
+  }
+
+  sendReply(msg: ContactMessage): void {
+    const body = this.replyText().trim();
+    if (!body) return;
+
+    this.replying.set(true);
+    this.replyError.set(null);
+
+    this.contactService.replyToMessage(msg._id, body).subscribe({
+      next: (updated) => {
+        this.messages.update((list) =>
+          list.map((m) => (m._id === msg._id ? { ...m, isReplied: true, repliedAt: updated.repliedAt } : m))
+        );
+        this.replying.set(false);
+        this.replyingTo.set(null);
+        this.replyText.set('');
+      },
+      error: (err) => {
+        this.replyError.set(err?.error?.message || 'Failed to send reply. Please try again.');
+        this.replying.set(false);
       },
     });
   }

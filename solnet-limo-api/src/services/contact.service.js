@@ -29,6 +29,14 @@ const deleteMessage = async (id) => {
   return ContactMessage.findByIdAndDelete(id);
 };
 
+const markAsReplied = async (id) => {
+  return ContactMessage.findByIdAndUpdate(
+    id,
+    { isReplied: true, repliedAt: new Date() },
+    { new: true }
+  );
+};
+
 const getMessageStats = async () => {
   const [total, unread] = await Promise.all([
     ContactMessage.countDocuments(),
@@ -37,4 +45,4 @@ const getMessageStats = async () => {
   return { total, unread };
 };
 
-module.exports = { createMessage, getAllMessages, getMessageById, markAsRead, deleteMessage, getMessageStats };
+module.exports = { createMessage, getAllMessages, getMessageById, markAsRead, deleteMessage, getMessageStats, markAsReplied };

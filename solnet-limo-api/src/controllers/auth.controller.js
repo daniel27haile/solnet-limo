@@ -4,7 +4,7 @@ const { success, error } = require('../utils/apiResponse');
 const AdminUser = require('../models/AdminUser');
 
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

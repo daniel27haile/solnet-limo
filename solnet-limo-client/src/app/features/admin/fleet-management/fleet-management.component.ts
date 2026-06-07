@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FleetService } from '../../../core/services/fleet.service';
@@ -21,6 +21,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
           {{ showForm() ? 'Cancel' : 'Add Vehicle' }}
         </button>
       </div>
+
+      @if (successMsg()) {
+        <div class="alert alert-success" role="alert">{{ successMsg() }}</div>
+      }
+      @if (errorMsg()) {
+        <div class="alert alert-error" role="alert">{{ errorMsg() }}</div>
+      }
 
       @if (showForm()) {
         <div class="form-card" style="margin-bottom:32px;">
@@ -110,15 +117,18 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     </div>
   `,
 })
-export class FleetManagementComponent implements OnInit {
+export class FleetManagementComponent implements OnInit, OnDestroy {
   private fleetService = inject(FleetService);
   private fb = inject(FormBuilder);
 
-  vehicles = signal<FleetVehicle[]>([]);
-  loading = signal(true);
-  saving = signal(false);
-  showForm = signal(false);
+  vehicles  = signal<FleetVehicle[]>([]);
+  loading   = signal(true);
+  saving    = signal(false);
+  showForm  = signal(false);
   editingId = signal<string | null>(null);
+  successMsg = signal('');
+  errorMsg   = signal('');
+  private msgTimer?: ReturnType<typeof setTimeout>;
 
   form = this.fb.group({
     name:        ['', Validators.required],
@@ -159,6 +169,7 @@ export class FleetManagementComponent implements OnInit {
       features: featuresStr ? featuresStr.split(',').map((f: string) => f.trim()).filter(Boolean) : [],
     };
 
+    const wasEditing = !!this.editingId();
     const obs = this.editingId()
       ? this.fleetService.updateVehicle(this.editingId()!, data as any)
       : this.fleetService.createVehicle(data as any);
@@ -170,9 +181,29 @@ export class FleetManagementComponent implements OnInit {
         this.editingId.set(null);
         this.form.reset({ image: 'assets/images/fleet/default-vehicle.jpg' });
         this.ngOnInit();
+        this.showMsg('successMsg', wasEditing ? 'Vehicle updated.' : 'Vehicle added successfully.');
       },
-      error: () => this.saving.set(false),
+      error: (err) => {
+        this.saving.set(false);
+        this.showMsg('errorMsg', err?.error?.message || 'Failed to save. Please try again.');
+      },
     });
+  }
+
+  private showMsg(type: 'successMsg' | 'errorMsg', text: string): void {
+    this.successMsg.set('');
+    this.errorMsg.set('');
+    clearTimeout(this.msgTimer);
+    if (type === 'successMsg') {
+      this.successMsg.set(text);
+    } else {
+      this.errorMsg.set(text);
+    }
+    this.msgTimer = setTimeout(() => { this.successMsg.set(''); this.errorMsg.set(''); }, 4000);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.msgTimer);
   }
 
   toggleForm(): void {

@@ -154,9 +154,19 @@
       highlight="Payment Methods"
       [centered]="true"
     />
-    <div class="payment-grid">
-      @for (method of paymentMethods; track method) {
-        <div class="payment-item">{{ method }}</div>
+    <div class="payment-groups">
+      @for (group of paymentGroups; track group.label) {
+        <div class="payment-group">
+          <div class="payment-group__header">
+            <span class="material-icons" aria-hidden="true">{{ group.icon }}</span>
+            <span>{{ group.label }}</span>
+          </div>
+          <div class="payment-group__methods">
+            @for (method of group.methods; track method) {
+              <div class="payment-method">{{ method }}</div>
+            }
+          </div>
+        </div>
       }
     </div>
   </div>

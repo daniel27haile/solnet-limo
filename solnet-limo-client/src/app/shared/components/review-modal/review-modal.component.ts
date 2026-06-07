@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
+import { Component, OnDestroy, Input, Output, EventEmitter, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../../core/services/review.service';
 import { CreateReviewDto } from '../../../core/models/review.model';
@@ -280,7 +280,8 @@ import { CreateReviewDto } from '../../../core/models/review.model';
     }
   `],
 })
-export class ReviewModalComponent {
+export class ReviewModalComponent implements OnDestroy {
+  private closeTimer?: ReturnType<typeof setTimeout>;
   @Input({ required: true }) bookingId!: string;
   @Input({ required: true }) customerName!: string;
   @Input({ required: true }) customerEmail!: string;
@@ -338,6 +339,8 @@ export class ReviewModalComponent {
       next: () => {
         this.submitting.set(false);
         this.submitted.set(true);
+        clearTimeout(this.closeTimer);
+        this.closeTimer = setTimeout(() => this.close(), 4000);
       },
       error: (err) => {
         this.submitting.set(false);
@@ -347,6 +350,11 @@ export class ReviewModalComponent {
   }
 
   close(): void {
+    clearTimeout(this.closeTimer);
     this.closed.emit();
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.closeTimer);
   }
 }

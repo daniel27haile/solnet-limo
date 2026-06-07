@@ -1,17 +1,16 @@
 import {
-  Component, OnInit, OnDestroy, AfterViewChecked,
+  Component, OnInit, OnDestroy,
   inject, signal, ChangeDetectorRef,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { COMPANY, SERVICE_TYPES } from '../../../core/constants/app.constants';
 import { BookingService } from '../../../core/services/booking.service';
 import { FleetService } from '../../../core/services/fleet.service';
 import { PricingService } from '../../../core/services/pricing.service';
-import { MapsService } from '../../../core/services/maps.service';
 import { PaymentService } from '../../../core/services/payment.service';
+import { AddressAutocompleteComponent, AddressSelectedEvent } from '../../../shared/components/address-autocomplete/address-autocomplete.component';
 import { FALLBACK_FLEET } from '../../../core/models/fleet.model';
 import { PriceCalculation } from '../../../core/models/pricing.model';
 import { PaymentConfirmation } from '../../../core/models/payment.model';
@@ -28,18 +27,17 @@ import { ReviewModalComponent } from '../../../shared/components/review-modal/re
     ReactiveFormsModule, CommonModule,
     SectionTitleComponent, LoadingSpinnerComponent,
     ProgressStepperComponent, PriceSummaryComponent,
-    ReviewModalComponent,
+    ReviewModalComponent, AddressAutocompleteComponent,
   ],
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.scss'],
 })
-export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class BookingComponent implements OnInit, OnDestroy {
   private fb             = inject(FormBuilder);
   private route          = inject(ActivatedRoute);
   private bookingService = inject(BookingService);
   private fleetService   = inject(FleetService);
   private pricingService = inject(PricingService);
-  private mapsService    = inject(MapsService);
   private paymentService = inject(PaymentService);
   private cdr            = inject(ChangeDetectorRef);
 
@@ -64,10 +62,6 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
   squareError   = signal('');
   submitting    = signal(false);
 
-  // Location
-  locating      = signal(false);
-  locationError = signal('');
-
   // Confirmation
   confirmation  = signal<PaymentConfirmation | null>(null);
 
@@ -79,14 +73,8 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   today = new Date().toISOString().split('T')[0];
 
-  // Track whether we've initialized autocomplete for the current DOM state
-  private autocompleteInitialized = false;
-  private lastRenderedStep = -1;
-  private pickupSub?: Subscription;
-
   form = this.fb.group({
     // Step 1: Trip Info
-    pickupMode:      ['manual'],
     pickupLocation:  ['', Validators.required],
     pickupLatitude:  [null as number | null],
     pickupLongitude: [null as number | null],
@@ -120,30 +108,10 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.applyQueryParams();
       },
     });
-
-    // Clear the geolocation error as soon as the user types a manual pickup address
-    this.pickupSub = this.form.get('pickupLocation')!.valueChanges.subscribe((val) => {
-      if (val && this.locationError()) {
-        this.locationError.set('');
-      }
-    });
-  }
-
-  ngAfterViewChecked(): void {
-    const step = this.currentStep();
-    if (step !== this.lastRenderedStep) {
-      this.lastRenderedStep = step;
-      this.autocompleteInitialized = false;
-    }
-    if (step === 0 && !this.autocompleteInitialized) {
-      this.autocompleteInitialized = true;
-      this.initAutocomplete();
-    }
   }
 
   ngOnDestroy(): void {
     this.paymentService.destroyCard().catch(() => {});
-    this.pickupSub?.unsubscribe();
   }
 
   private applyQueryParams(): void {
@@ -158,48 +126,18 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
-  private initAutocomplete(): void {
-    this.mapsService.loadMapsApi().then(() => {
-      const pickupEl = document.getElementById('pickupLocation') as HTMLInputElement | null;
-      const dropoffEl = document.getElementById('dropoffLocation') as HTMLInputElement | null;
+  // ─── Address Autocomplete Handlers ──────────────────────────────────────
 
-      if (pickupEl) {
-        this.mapsService.attachAutocomplete(pickupEl, (address, lat, lng) => {
-          this.form.patchValue({ pickupLocation: address, pickupLatitude: lat ?? null, pickupLongitude: lng ?? null });
-        });
-      }
-      if (dropoffEl) {
-        this.mapsService.attachAutocomplete(dropoffEl, (address) => {
-          this.form.patchValue({ dropoffLocation: address });
-        });
-      }
-    }).catch(() => {
-      // Maps not configured — manual entry still works fine
+  onPickupSelected(event: AddressSelectedEvent): void {
+    this.form.patchValue({
+      pickupLocation:  event.address,
+      pickupLatitude:  event.lat,
+      pickupLongitude: event.lng,
     });
   }
 
-  useCurrentLocation(): void {
-    this.locating.set(true);
-    this.locationError.set('');
-
-    this.mapsService.getCurrentLocation()
-      .then((coords) => this.mapsService.loadMapsApi().then(() => coords))
-      .then((coords) => this.mapsService.reverseGeocode(coords.latitude, coords.longitude).then(
-        (address) => ({ address, coords })
-      ))
-      .then(({ address, coords }) => {
-        this.form.patchValue({
-          pickupLocation: address,
-          pickupMode: 'location',
-          pickupLatitude: coords.latitude,
-          pickupLongitude: coords.longitude,
-        });
-        this.locating.set(false);
-      })
-      .catch((err: Error) => {
-        this.locationError.set(err.message);
-        this.locating.set(false);
-      });
+  onDropoffSelected(event: AddressSelectedEvent): void {
+    this.form.patchValue({ dropoffLocation: event.address });
   }
 
   // ─── Step Navigation ─────────────────────────────────────────────────────
@@ -212,6 +150,12 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
       if (!this.isStepValid(0)) {
         this.markStepTouched(0);
         this.stepError.set('Please fill in all required trip details.');
+        return;
+      }
+      const pickup  = (this.form.value.pickupLocation  ?? '').trim().toLowerCase();
+      const dropoff = (this.form.value.dropoffLocation ?? '').trim().toLowerCase();
+      if (pickup && dropoff && pickup === dropoff) {
+        this.stepError.set('Pickup and drop-off address cannot be the same.');
         return;
       }
       this.currentStep.set(1);
@@ -261,11 +205,12 @@ export class BookingComponent implements OnInit, OnDestroy, AfterViewChecked {
       error: (err) => {
         if (err.status === 0) {
           this.priceError.set(
-            'Cannot reach the server. Make sure the backend is running on port 3001, then click Retry.'
+            'We could not reach the server. Please check your connection and click Retry.'
           );
         } else {
           this.priceError.set(
-            err?.error?.message || 'Could not calculate price. Please check the addresses and try again.'
+            err?.error?.message ||
+            'We could not calculate the distance for these addresses. Please check the pickup and destination addresses.'
           );
         }
         this.loadingPrice.set(false);

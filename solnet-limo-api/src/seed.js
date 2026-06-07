@@ -104,16 +104,25 @@ const seed = async () => {
     console.log('Pricing settings already exist, skipping.');
   }
 
-  // Create admin user if not exists
+  // Create admin user if not exists.
+  // Pass the initial password via ADMIN_SEED_PASSWORD env var:
+  //   ADMIN_SEED_PASSWORD='YourStrongPassword!' node src/seed.js
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+  if (!adminPassword) {
+    console.error('ADMIN_SEED_PASSWORD env var is required to seed the admin user.');
+    console.error('  Usage: ADMIN_SEED_PASSWORD="YourStrongPassword!" node src/seed.js');
+    process.exit(1);
+  }
+
   const existingAdmin = await AdminUser.findOne({ email: 'admin@solnetlimo.com' });
   if (!existingAdmin) {
     await AdminUser.create({
       name: 'Solomon',
       email: 'admin@solnetlimo.com',
-      password: 'SolnetAdmin2024!',
+      password: adminPassword,
       role: 'superadmin',
     });
-    console.log('Admin user created: admin@solnetlimo.com / SolnetAdmin2024!');
+    console.log('Admin user created: admin@solnetlimo.com');
     console.log('IMPORTANT: Change the admin password after first login!');
   } else {
     console.log('Admin user already exists, skipping.');

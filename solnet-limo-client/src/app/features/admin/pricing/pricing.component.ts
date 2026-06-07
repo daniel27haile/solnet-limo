@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { PricingService } from '../../../core/services/pricing.service';
@@ -129,7 +129,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     </div>
   `,
 })
-export class PricingComponent implements OnInit {
+export class PricingComponent implements OnInit, OnDestroy {
   private pricingService = inject(PricingService);
   private fb = inject(FormBuilder);
 
@@ -138,6 +138,7 @@ export class PricingComponent implements OnInit {
   successMsg      = signal('');
   errorMsg        = signal('');
   currentSettings = signal<PricingSettings | null>(null);
+  private msgTimer?: ReturnType<typeof setTimeout>;
 
   form = this.fb.group({
     mileageThreshold:  [30, [Validators.required, Validators.min(1)]],
@@ -173,13 +174,22 @@ export class PricingComponent implements OnInit {
     this.pricingService.updateSettings(this.form.value as any).subscribe({
       next: (updated) => {
         this.currentSettings.set(updated);
-        this.successMsg.set('Pricing settings saved successfully.');
         this.saving.set(false);
+        this.successMsg.set('Pricing settings saved successfully.');
+        this.errorMsg.set('');
+        clearTimeout(this.msgTimer);
+        this.msgTimer = setTimeout(() => this.successMsg.set(''), 4000);
       },
       error: (err) => {
         this.errorMsg.set(err?.error?.message || 'Failed to save settings. Please try again.');
         this.saving.set(false);
+        clearTimeout(this.msgTimer);
+        this.msgTimer = setTimeout(() => this.errorMsg.set(''), 4000);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.msgTimer);
   }
 }

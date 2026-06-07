@@ -24,7 +24,7 @@ export type PaymentMethod =
   | 'Mastercard'
   | 'American Express'
   | 'Discover'
-  | 'Cash App'
+  | 'Cash App Pay'
   | 'Zelle';
 
 export type PaymentStatus = 'unpaid' | 'pending' | 'paid' | 'failed' | 'refunded';

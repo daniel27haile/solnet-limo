@@ -101,40 +101,6 @@
   }
 }
 
-// ─── Location Field ───────────────────────────────────────────────────────────
-
-.location-field {
-  display: flex;
-  gap: $spacing-sm;
-
-  input { flex: 1; }
-
-  .btn-location {
-    @include flex-center;
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-    background: $color-mid-gray;
-    border: 1px solid rgba($color-gold, 0.3);
-    border-radius: $radius-sm;
-    color: $color-gold;
-    cursor: pointer;
-    transition: $transition-fast;
-
-    &:hover:not(:disabled) {
-      background: rgba($color-gold, 0.15);
-      border-color: $color-gold;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .material-icons { font-size: 1.2rem; }
-  }
-}
-
 // ─── Review Grid ──────────────────────────────────────────────────────────────
 
 .review-grid {

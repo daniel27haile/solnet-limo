@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { COMPANY, PAYMENT_METHODS } from '../../../core/constants/app.constants';
+import { COMPANY, PAYMENT_GROUPS } from '../../../core/constants/app.constants';
 import { ServicesDataService } from '../../../core/services/services-data.service';
 import { FleetService } from '../../../core/services/fleet.service';
 import { ReviewService } from '../../../core/services/review.service';
@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
   private reviewService = inject(ReviewService);
 
   company = COMPANY;
-  paymentMethods = PAYMENT_METHODS;
+  paymentGroups = PAYMENT_GROUPS;
 
   services = signal<Service[]>([]);
   fleet = signal<FleetVehicle[]>([]);

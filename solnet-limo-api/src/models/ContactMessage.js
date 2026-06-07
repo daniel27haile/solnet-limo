@@ -36,6 +36,13 @@ const contactMessageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isReplied: {
+      type: Boolean,
+      default: false,
+    },
+    repliedAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

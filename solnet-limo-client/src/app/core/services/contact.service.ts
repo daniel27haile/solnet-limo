@@ -51,4 +51,10 @@ export class ContactService {
       .get<ApiResponse<MessageStats>>(`${this.base}/stats`)
       .pipe(map((res) => res.data));
   }
+
+  replyToMessage(id: string, replyBody: string): Observable<ContactMessage> {
+    return this.http
+      .post<ApiResponse<ContactMessage>>(`${this.base}/${id}/reply`, { replyBody })
+      .pipe(map((res) => res.data));
+  }
 }

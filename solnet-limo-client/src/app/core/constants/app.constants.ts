@@ -36,9 +36,22 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   'Mastercard',
   'American Express',
   'Discover',
-  'Cash App',
+  'Cash App Pay',
   'Zelle',
 ];
+
+export const PAYMENT_GROUPS = [
+  {
+    label: 'Credit & Debit Cards',
+    icon: 'credit_card',
+    methods: ['Visa', 'Mastercard', 'American Express', 'Discover'],
+  },
+  {
+    label: 'Digital Payments',
+    icon: 'phone_iphone',
+    methods: ['Cash App Pay', 'Zelle'],
+  },
+] as const;
 
 export const NAV_LINKS = [
   { label: 'Home', path: '/' },
@@ -61,7 +74,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: 'What payment methods do you accept?',
-    answer: 'We accept Visa, Mastercard, American Express, Discover, Cash App, and Zelle for your convenience.',
+    answer: 'We accept Visa, Mastercard, American Express, Discover, Cash App Pay, and Zelle for your convenience.',
   },
   {
     question: 'Do you track flights for airport pickups?',

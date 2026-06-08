@@ -62,7 +62,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       @if (loading()) {
         <app-loading-spinner [fullscreen]="true" />
       } @else {
-        <div style="overflow-x:auto;">
+        <div class="table-scroll">
           <table class="data-table">
             <thead>
               <tr>

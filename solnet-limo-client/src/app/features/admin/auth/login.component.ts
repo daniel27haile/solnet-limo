@@ -84,6 +84,11 @@ import { AuthService } from '../../../core/services/auth.service';
       border: 1px solid rgba(201,168,76,0.25);
       border-radius: 12px;
       padding: 48px 40px;
+
+      @media (max-width: 479px) {
+        padding: 32px 20px;
+        border-radius: 8px;
+      }
     }
 
     .login-brand {

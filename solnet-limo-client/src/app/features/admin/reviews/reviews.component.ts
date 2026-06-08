@@ -20,7 +20,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       } @else if (reviews().length === 0) {
         <p style="color:#888; text-align:center; padding:48px 0;">No reviews yet.</p>
       } @else {
-        <div style="overflow-x:auto;">
+        <div class="table-scroll">
           <table class="data-table">
             <thead>
               <tr>

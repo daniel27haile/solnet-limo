@@ -70,7 +70,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
           @if (recentBookings().length === 0) {
             <p style="color:#888; padding:24px 0; text-align:center;">No bookings yet.</p>
           } @else {
-            <div style="overflow-x:auto;">
+            <div class="table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -106,7 +106,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
           @if (recentMessages().length === 0) {
             <p style="color:#888; padding:24px 0; text-align:center;">No messages yet.</p>
           } @else {
-            <div style="overflow-x:auto;">
+            <div class="table-scroll">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -140,8 +140,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   styles: [`
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+
+      @media (max-width: 479px) {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
     }
 
     .section-box {

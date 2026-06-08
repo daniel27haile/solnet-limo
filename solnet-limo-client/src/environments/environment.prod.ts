@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: "https://api.solnetlimo.com/api",
+  apiUrl: "https://solnetlimo.com/api",
   googleMapsBrowserKey: "AIzaSyDmJ6NZItBQrcQtsScYFNd9JyLGY8kHYKc",
-  squareAppId: "sandbox-sq0idb-e5Bg7BC6YOlzntxvTNFfbA",
+  squareAppId: "sq0idp-6TasYRe2tAWnnmoAFypJ7Q",
   squareLocationId: "L7X57CJAZVCFG",
   squareSdkUrl: "https://web.squarecdn.com/v1/square.js",
 };

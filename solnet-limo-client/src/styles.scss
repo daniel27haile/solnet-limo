@@ -45,6 +45,8 @@
 
 // Admin overrides
 .admin-layout {
+
+  // ── Sidebar ────────────────────────────────────────────────────────
   .sidebar {
     width: 260px;
     min-height: 100vh;
@@ -54,7 +56,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 200;
+    overflow-y: auto;
+    transition: transform 0.28s ease;
 
     .sidebar-brand {
       padding: $spacing-lg $spacing-xl;
@@ -84,6 +88,7 @@
       font-weight: $font-weight-medium;
       color: $color-gray-light;
       transition: $transition-fast;
+      min-height: 48px; // touch target
 
       .material-icons { font-size: 1.1rem; }
 
@@ -96,6 +101,16 @@
     }
   }
 
+  // ── Mobile backdrop ────────────────────────────────────────────────
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 199;
+    cursor: pointer;
+  }
+
+  // ── Main content ───────────────────────────────────────────────────
   .admin-content {
     margin-left: 260px;
     min-height: 100vh;
@@ -109,20 +124,54 @@
       border-bottom: 1px solid $border-color;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 150;
+      gap: $spacing-md;
 
-      h1 {
-        font-size: 1.2rem;
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        min-width: 0;
+      }
+
+      .topbar-title {
+        font-size: 1.1rem;
         font-weight: $font-weight-semibold;
         color: $color-white;
+        white-space: nowrap;
+      }
+
+      // Hamburger — hidden on desktop, shown on tablet/mobile
+      .admin-hamburger {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        background: transparent;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        color: $color-gray-light;
+        cursor: pointer;
+        transition: $transition-fast;
+
+        &:hover { color: $color-gold; border-color: $color-gold; }
+        &:focus-visible { outline: 2px solid $color-gold; outline-offset: 2px; }
+        .material-icons { font-size: 1.25rem; }
       }
 
       .topbar-user {
         display: flex;
         align-items: center;
         gap: $spacing-md;
+        flex-shrink: 0;
 
-        span { font-size: 0.875rem; color: $color-gray-light; }
+        .topbar-username {
+          font-size: 0.875rem;
+          color: $color-gray-light;
+          white-space: nowrap;
+        }
 
         button {
           @include flex-center;
@@ -135,6 +184,8 @@
           color: $color-error;
           cursor: pointer;
           transition: $transition-fast;
+          white-space: nowrap;
+          min-height: 40px;
 
           &:hover { background: rgba($color-error, 0.2); }
           .material-icons { font-size: 0.9rem; }
@@ -144,13 +195,56 @@
 
     .admin-body {
       padding: $spacing-xl;
+
+      @include max-md {
+        padding: $spacing-md;
+      }
     }
   }
 
+  // ── Breakpoint: tablet and below (< 992px) ─────────────────────────
   @include max-lg {
-    .sidebar { display: none; }
-    .admin-content { margin-left: 0; }
+    .sidebar {
+      transform: translateX(-260px);
+
+      &.sidebar--open {
+        transform: translateX(0);
+        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    .admin-content {
+      margin-left: 0;
+
+      .admin-topbar {
+        padding: 0 $spacing-md;
+
+        .admin-hamburger { display: flex; }
+
+        .topbar-username { display: none; }
+      }
+    }
   }
+
+  // ── Breakpoint: small mobile (< 480px) ────────────────────────────
+  @include max-xs {
+    .admin-content {
+      .admin-topbar {
+        .topbar-title { font-size: 0.9rem; }
+
+        .topbar-user button .topbar-logout-label { display: none; }
+        .topbar-user button { padding: 8px 10px; }
+      }
+    }
+  }
+}
+
+// Admin table scroll wrapper
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: $radius-md;
 }
 
 // Admin table
@@ -160,6 +254,8 @@
   background: $color-dark-gray;
   border-radius: $radius-md;
   overflow: hidden;
+  // Prevent table from shrinking narrower than content
+  min-width: 480px;
 
   th {
     padding: $spacing-md $spacing-lg;
@@ -179,33 +275,46 @@
     color: $color-silver;
     border-bottom: 1px solid rgba($color-gold, 0.08);
     vertical-align: middle;
+    word-break: break-word;
   }
 
   tr:last-child td { border-bottom: none; }
-
-  tr:hover td {
-    background: rgba($color-gold, 0.03);
-  }
+  tr:hover td { background: rgba($color-gold, 0.03); }
 
   .table-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: $spacing-sm;
 
     button {
       padding: 6px 12px;
+      min-height: 36px;
       border-radius: $radius-sm;
       font-size: 0.75rem;
       cursor: pointer;
       transition: $transition-fast;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
 
       .material-icons { font-size: 0.875rem; }
 
-      &.btn-view  { background: rgba($color-info, 0.15); color: $color-info; border: 1px solid rgba($color-info, 0.3); &:hover { background: rgba($color-info, 0.25); } }
-      &.btn-edit  { background: rgba($color-gold, 0.15); color: $color-gold; border: 1px solid rgba($color-gold, 0.3); &:hover { background: rgba($color-gold, 0.25); } }
+      &.btn-view   { background: rgba($color-info, 0.15);  color: $color-info;  border: 1px solid rgba($color-info, 0.3);  &:hover { background: rgba($color-info, 0.25); } }
+      &.btn-edit   { background: rgba($color-gold, 0.15);  color: $color-gold;  border: 1px solid rgba($color-gold, 0.3);  &:hover { background: rgba($color-gold, 0.25); } }
       &.btn-delete { background: rgba($color-error, 0.15); color: $color-error; border: 1px solid rgba($color-error, 0.3); &:hover { background: rgba($color-error, 0.25); } }
+    }
+  }
+
+  // Increase touch targets on mobile
+  @include max-md {
+    th { padding: $spacing-sm $spacing-md; font-size: 0.7rem; }
+    td { padding: $spacing-sm $spacing-md; font-size: 0.8rem; }
+
+    .table-actions button {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 8px 10px;
     }
   }
 }

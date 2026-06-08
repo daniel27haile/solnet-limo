@@ -14,7 +14,23 @@ const calculateFromDistance = async (distanceMiles) => {
 
   const pricingType = distanceMiles <= pricing.mileageThreshold ? 'short-distance' : 'long-distance';
   const rateUsed = pricingType === 'short-distance' ? pricing.shortDistanceRate : pricing.longDistanceRate;
-  const estimatedTotal = parseFloat((distanceMiles * rateUsed).toFixed(2));
+  let estimatedTotal = parseFloat((distanceMiles * rateUsed).toFixed(2));
+
+  let minimumFareApplied = false;
+  const minFareEnabled = pricing.minimumFareEnabled !== false && pricing.minimumFareEnabled !== undefined
+    ? pricing.minimumFareEnabled
+    : false;
+
+  if (
+    minFareEnabled &&
+    pricing.minimumFareAmount > 0 &&
+    pricing.minimumFareDistance > 0 &&
+    distanceMiles < pricing.minimumFareDistance &&
+    estimatedTotal < pricing.minimumFareAmount
+  ) {
+    estimatedTotal = pricing.minimumFareAmount;
+    minimumFareApplied = true;
+  }
 
   return {
     distanceMiles,
@@ -23,6 +39,9 @@ const calculateFromDistance = async (distanceMiles) => {
     pricingType,
     estimatedTotal,
     currency: pricing.currency,
+    minimumFareApplied,
+    minimumFareAmount: pricing.minimumFareAmount || null,
+    minimumFareDistance: pricing.minimumFareDistance || null,
   };
 };
 

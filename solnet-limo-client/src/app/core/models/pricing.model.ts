@@ -5,6 +5,9 @@ export interface PricingSettings {
   longDistanceRate: number;
   currency: string;
   isActive: boolean;
+  minimumFareEnabled: boolean;
+  minimumFareDistance: number;
+  minimumFareAmount: number;
   updatedBy?: string;
   updatedAt?: string;
 }
@@ -19,4 +22,7 @@ export interface PriceCalculation {
   durationText?: string;
   pickupResolvedAddress?: string;
   dropoffResolvedAddress?: string;
+  minimumFareApplied?: boolean;
+  minimumFareAmount?: number;
+  minimumFareDistance?: number;
 }

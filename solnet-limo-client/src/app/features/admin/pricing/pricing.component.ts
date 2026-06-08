@@ -82,6 +82,54 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 />
               </div>
 
+              <!-- Minimum Fare -->
+              <div style="margin-top:28px; padding-top:24px; border-top:1px solid rgba(201,168,76,0.12);">
+                <h4 style="color:#c9a84c; font-size:0.875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin:0 0 16px;">
+                  Minimum Fare
+                </h4>
+
+                <div class="form-group">
+                  <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <input
+                      type="checkbox"
+                      formControlName="minimumFareEnabled"
+                      style="width:16px; height:16px; accent-color:#c9a84c; cursor:pointer;"
+                    />
+                    Enable minimum fare for short trips
+                  </label>
+                  <small style="color:#888; font-size:0.78rem; margin-top:4px; display:block;">
+                    When enabled, trips shorter than the distance below will use the minimum fare amount.
+                  </small>
+                </div>
+
+                @if (form.value.minimumFareEnabled) {
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="minimumFareDistance">Apply when trip is under (miles)</label>
+                      <input
+                        id="minimumFareDistance"
+                        type="number"
+                        formControlName="minimumFareDistance"
+                        min="0.1"
+                        step="0.5"
+                        placeholder="e.g. 5"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="minimumFareAmount">Minimum fare amount ($)</label>
+                      <input
+                        id="minimumFareAmount"
+                        type="number"
+                        formControlName="minimumFareAmount"
+                        min="0.01"
+                        step="1"
+                        placeholder="e.g. 30"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+
               <!-- Preview -->
               @if (form.valid) {
                 <div class="pricing-preview">
@@ -93,6 +141,10 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                     &nbsp;|&nbsp;
                     trips &gt; {{ form.value.mileageThreshold }} mi
                     &#8594; {{ form.value.longDistanceRate | currency:'USD':'symbol':'1.2-2' }}/mi
+                    @if (form.value.minimumFareEnabled) {
+                      &nbsp;|&nbsp;
+                      min fare {{ form.value.minimumFareAmount | currency:'USD':'symbol':'1.2-2' }} under {{ form.value.minimumFareDistance }} mi
+                    }
                   </div>
                 </div>
               }
@@ -141,10 +193,13 @@ export class PricingComponent implements OnInit, OnDestroy {
   private msgTimer?: ReturnType<typeof setTimeout>;
 
   form = this.fb.group({
-    mileageThreshold:  [30, [Validators.required, Validators.min(1)]],
-    shortDistanceRate: [6,  [Validators.required, Validators.min(0.01)]],
-    longDistanceRate:  [3,  [Validators.required, Validators.min(0.01)]],
-    currency:          ['USD', Validators.required],
+    mileageThreshold:    [30,   [Validators.required, Validators.min(1)]],
+    shortDistanceRate:   [6,    [Validators.required, Validators.min(0.01)]],
+    longDistanceRate:    [3,    [Validators.required, Validators.min(0.01)]],
+    currency:            ['USD', Validators.required],
+    minimumFareEnabled:  [true],
+    minimumFareDistance: [5,    [Validators.required, Validators.min(0.1)]],
+    minimumFareAmount:   [30,   [Validators.required, Validators.min(0.01)]],
   });
 
   ngOnInit(): void {
@@ -152,10 +207,13 @@ export class PricingComponent implements OnInit, OnDestroy {
       next: (settings) => {
         this.currentSettings.set(settings);
         this.form.patchValue({
-          mileageThreshold:  settings.mileageThreshold,
-          shortDistanceRate: settings.shortDistanceRate,
-          longDistanceRate:  settings.longDistanceRate,
-          currency:          settings.currency,
+          mileageThreshold:    settings.mileageThreshold,
+          shortDistanceRate:   settings.shortDistanceRate,
+          longDistanceRate:    settings.longDistanceRate,
+          currency:            settings.currency,
+          minimumFareEnabled:  settings.minimumFareEnabled ?? true,
+          minimumFareDistance: settings.minimumFareDistance ?? 5,
+          minimumFareAmount:   settings.minimumFareAmount ?? 30,
         });
         this.loading.set(false);
       },

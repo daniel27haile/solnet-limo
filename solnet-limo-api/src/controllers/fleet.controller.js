@@ -3,7 +3,7 @@ const { success, created, error } = require('../utils/apiResponse');
 const FleetVehicle = require('../models/FleetVehicle');
 
 exports.getFleet = asyncHandler(async (req, res) => {
-  const vehicles = await FleetVehicle.find({ isActive: true }).sort({ sortOrder: 1, createdAt: 1 });
+  const vehicles = await FleetVehicle.find().sort({ sortOrder: 1, createdAt: 1 });
   success(res, vehicles);
 });
 

@@ -96,10 +96,13 @@ const seed = async () => {
       shortDistanceRate: 6,
       longDistanceRate: 3,
       currency: 'USD',
+      minimumFareEnabled: true,
+      minimumFareDistance: 5,
+      minimumFareAmount: 30,
       isActive: true,
       updatedBy: 'seed',
     });
-    console.log('Pricing settings seeded: threshold=30mi, short=$6/mi, long=$3/mi');
+    console.log('Pricing settings seeded: threshold=30mi, short=$6/mi, long=$3/mi, minFare=$30 under 5mi');
   } else {
     console.log('Pricing settings already exist, skipping.');
   }

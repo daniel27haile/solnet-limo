@@ -159,6 +159,26 @@ jobs:
              fi && \
              pm2 save"
 
+      # ── Deploy Nginx config ───────────────────────────────────────────────────
+
+      - name: Deploy Nginx config
+        env:
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_PORT: ${{ secrets.DO_PORT }}
+        run: |
+          DO_PORT="${DO_PORT:-22}"
+          # Upload config to a temp location first
+          scp -i ~/.ssh/deploy_key -P "$DO_PORT" \
+            nginx/solnet-limo.conf \
+            "$DO_USER@$DO_HOST":/tmp/solnet-limo.conf
+          # Install and enable it
+          ssh -i ~/.ssh/deploy_key -p "$DO_PORT" \
+            "$DO_USER@$DO_HOST" \
+            "sudo cp /tmp/solnet-limo.conf /etc/nginx/sites-available/solnet-limo && \
+             sudo ln -sf /etc/nginx/sites-available/solnet-limo \
+                         /etc/nginx/sites-enabled/solnet-limo"
+
       # ── Reload Nginx ─────────────────────────────────────────────────────────
 
       - name: Reload Nginx

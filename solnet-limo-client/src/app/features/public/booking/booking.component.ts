@@ -99,7 +99,8 @@ export class BookingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.fleetService.getFleet().subscribe({
       next: (data) => {
-        if (data.length) this.vehicleTypes.set(data.map((v) => v.name));
+        const active = data.filter((v) => v.isActive !== false);
+        if (active.length) this.vehicleTypes.set(active.map((v) => v.name));
         this.loadingVehicles.set(false);
         this.applyQueryParams();
       },

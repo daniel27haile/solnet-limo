@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -91,10 +91,17 @@ const adminNav = [
     </div>
   `,
 })
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnInit {
   authService = inject(AuthService);
   navLinks = adminNav;
   menuOpen = signal(false);
+
+  ngOnInit(): void {
+    // Validate the stored token against the server on every admin page load.
+    // If the token is expired or revoked, the 401 interceptor calls logout()
+    // and redirects cleanly to the login page — no black screen.
+    this.authService.getMe().subscribe({ error: () => {} });
+  }
 
   toggleMenu(): void {
     this.menuOpen.update((v) => !v);

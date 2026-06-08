@@ -38,6 +38,13 @@ import { PriceCalculation } from '../../../core/models/pricing.model';
         </div>
       </div>
 
+      @if (pricing.minimumFareApplied) {
+        <div class="price-summary__row price-summary__row--minfare">
+          <span class="material-icons" aria-hidden="true">info_outline</span>
+          <span>Minimum fare applied for trips under {{ pricing.minimumFareDistance }} miles.</span>
+        </div>
+      }
+
       <div class="price-summary__total">
         <span>Estimated Total</span>
         <strong>\${{ pricing.estimatedTotal.toFixed(2) }} {{ pricing.currency }}</strong>

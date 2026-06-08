@@ -100,10 +100,27 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   </td>
                   <td>
                     <div class="table-actions">
-                      <button class="btn-edit" (click)="editVehicle(v)">
+                      <button
+                        class="btn-edit"
+                        (click)="editVehicle(v)"
+                        aria-label="Edit vehicle"
+                      >
                         <span class="material-icons" aria-hidden="true">edit</span>
                       </button>
-                      <button class="btn-delete" (click)="deleteVehicle(v._id)">
+                      <button
+                        [class]="v.isActive ? 'btn-toggle-off' : 'btn-toggle-on'"
+                        (click)="toggleActive(v)"
+                        [title]="v.isActive ? 'Mark Inactive' : 'Mark Active'"
+                        [attr.aria-label]="v.isActive ? 'Mark ' + v.name + ' inactive' : 'Mark ' + v.name + ' active'"
+                      >
+                        <span class="material-icons" aria-hidden="true">{{ v.isActive ? 'toggle_on' : 'toggle_off' }}</span>
+                        {{ v.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                      <button
+                        class="btn-delete"
+                        (click)="deleteVehicle(v._id)"
+                        aria-label="Delete vehicle"
+                      >
                         <span class="material-icons" aria-hidden="true">delete</span>
                       </button>
                     </div>
@@ -116,6 +133,32 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       }
     </div>
   `,
+  styles: [`
+    .btn-toggle-on, .btn-toggle-off {
+      padding: 6px 12px;
+      min-height: 36px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      .material-icons { font-size: 0.875rem; }
+    }
+    .btn-toggle-on {
+      background: rgba(34,197,94,0.12);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.3);
+      &:hover { background: rgba(34,197,94,0.22); }
+    }
+    .btn-toggle-off {
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.3);
+      &:hover { background: rgba(251,191,36,0.22); }
+    }
+  `],
 })
 export class FleetManagementComponent implements OnInit, OnDestroy {
   private fleetService = inject(FleetService);
@@ -208,6 +251,24 @@ export class FleetManagementComponent implements OnInit, OnDestroy {
 
   toggleForm(): void {
     this.showForm.update((v) => !v);
+  }
+
+  toggleActive(v: FleetVehicle): void {
+    const newStatus = !v.isActive;
+    const msg = newStatus
+      ? `Mark "${v.name}" as Active? It will become bookable on the website.`
+      : `Mark "${v.name}" as Inactive? Users will see it but cannot book it.`;
+    if (!confirm(msg)) return;
+
+    this.fleetService.updateVehicle(v._id, { isActive: newStatus }).subscribe({
+      next: (updated) => {
+        this.vehicles.update((list) => list.map((item) => item._id === v._id ? updated : item));
+        this.showMsg('successMsg', `"${v.name}" marked as ${newStatus ? 'Active' : 'Inactive'}.`);
+      },
+      error: (err) => {
+        this.showMsg('errorMsg', err?.error?.message || 'Failed to update status. Please try again.');
+      },
+    });
   }
 
   deleteVehicle(id: string): void {

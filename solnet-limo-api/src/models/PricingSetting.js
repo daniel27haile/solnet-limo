@@ -20,6 +20,20 @@ const pricingSettingSchema = new mongoose.Schema(
       min: [0.01, 'Rate must be greater than 0'],
       default: 3,
     },
+    minimumFareEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    minimumFareDistance: {
+      type: Number,
+      default: 5,
+      min: [0.1, 'Minimum fare distance must be greater than 0'],
+    },
+    minimumFareAmount: {
+      type: Number,
+      default: 30,
+      min: [0.01, 'Minimum fare amount must be greater than 0'],
+    },
     currency: {
       type: String,
       default: 'USD',

@@ -7,14 +7,56 @@
   <meta name="description" content="Solnet Limo offers elite chauffeur transportation services including wedding, prom, airport, corporate, and 24/7 limo service. Call 970-473-1479.">
   <meta name="keywords" content="limo service, airport transportation, chauffeur service, wedding transportation, prom limo service, corporate transportation, 24/7 transportation service, solnet limo">
   <meta name="author" content="Solnet Limo">
+
+  <!-- Open Graph -->
   <meta property="og:title" content="Solnet Limo | Elite Transportation Service">
   <meta property="og:description" content="Create an Elegant Impression & a Memory for the Lifetime! Professional limo service available 24/7.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://solnetlimo.com/">
+  <meta property="og:image" content="https://solnetlimo.com/assets/images/hero/hero.jpg">
+  <meta property="og:image:width" content="577">
+  <meta property="og:image:height" content="433">
+  <meta property="og:image:alt" content="Solnet Limo – Elite Transportation Service">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://solnetlimo.com/">
+
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Preload LCP hero image -->
+  <link rel="preload" as="image" href="assets/images/hero/hero.webp" type="image/webp"
+        imagesrcset="assets/images/hero/hero-400w.webp 400w, assets/images/hero/hero.webp 577w"
+        imagesizes="100vw">
+
+  <!-- Google Fonts — non-blocking with font-display:swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </noscript>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet">
+
+  <!-- LocalBusiness structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LimousineService",
+    "name": "Solnet Limo",
+    "description": "Elite chauffeur transportation service available 24/7 for weddings, proms, airports, and corporate events.",
+    "url": "https://solnetlimo.com",
+    "telephone": "+1-970-473-1479",
+    "email": "hello@solnetlimo.com",
+    "slogan": "Create an Elegant Impression & a Memory for the Lifetime!",
+    "image": "https://solnetlimo.com/assets/images/hero/hero.jpg",
+    "priceRange": "$$",
+    "openingHours": "Mo-Su 00:00-24:00",
+    "sameAs": []
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>

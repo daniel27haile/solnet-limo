@@ -21,12 +21,17 @@ import { SectionTitleComponent } from '../../../shared/components/section-title/
       <div class="container">
         <div class="about-grid">
           <div class="about-image">
-            <img
-              src="assets/images/about/about-image.jpg"
-              alt="Professional Solnet Limo chauffeur in front of luxury black SUV"
-              loading="lazy"
-              (error)="onImageError($event)"
-            />
+            <picture>
+              <source type="image/webp" srcset="assets/images/about/about-image.webp" />
+              <img
+                src="assets/images/about/about-image.jpg"
+                alt="Professional Solnet Limo chauffeur in front of luxury black SUV"
+                loading="lazy"
+                width="666"
+                height="375"
+                (error)="onImageError($event)"
+              />
+            </picture>
             <div class="about-badge">
               <span class="material-icons" aria-hidden="true">verified</span>
               <div>

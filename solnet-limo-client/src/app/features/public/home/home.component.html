@@ -1,13 +1,25 @@
 <!-- HERO SECTION -->
 <section class="hero" aria-label="Hero section">
 
-  <!-- Responsive hero image — art-directed with explicit breakpoint ranges -->
-  <img
-    src="assets/images/hero/hero.jpg"
-    alt="Luxury limousine transportation service – Solnet Limo"
-    class="hero__img"
-    loading="eager"
-  />
+  <!-- LCP hero image — WebP with JPEG fallback, preloaded in index.html -->
+  <picture>
+    <source
+      type="image/webp"
+      srcset="assets/images/hero/hero-400w.webp 400w, assets/images/hero/hero.webp 577w"
+      sizes="100vw"
+    />
+    <img
+      src="assets/images/hero/hero.jpg"
+      srcset="assets/images/hero/hero.jpg 577w"
+      sizes="100vw"
+      alt="Luxury limousine transportation service – Solnet Limo"
+      class="hero__img"
+      loading="eager"
+      fetchpriority="high"
+      width="577"
+      height="433"
+    />
+  </picture>
 
   <div class="hero__content">
     <div class="hero__badge">

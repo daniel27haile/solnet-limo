@@ -16,14 +16,19 @@ import { COMPANY } from '../../../core/constants/app.constants';
             <span>Unavailable</span>
           </div>
         }
-        <img
-          [src]="vehicleImageUrl"
-          [alt]="vehicle.name + ' - Solnet Limo'"
-          class="card__image"
-          [style.object-fit]="vehicle.imageFit || 'cover'"
-          loading="eager"
-          (error)="onImageError($event)"
-        />
+        <picture>
+          <source type="image/webp" [srcset]="vehicleWebpUrl" />
+          <img
+            [src]="vehicleImageUrl"
+            [alt]="vehicle.name + ' - Solnet Limo'"
+            class="card__image"
+            [style.object-fit]="vehicle.imageFit || 'cover'"
+            loading="lazy"
+            width="800"
+            height="400"
+            (error)="onImageError($event)"
+          />
+        </picture>
       </div>
       <div class="card__body">
         <div class="card__title-row">
@@ -305,6 +310,13 @@ export class FleetCardComponent implements OnDestroy {
       return `assets/images/fleet/${this.vehicle.slug}/${this.vehicle.slug}.jpg`;
     }
     return this.vehicle.image;
+  }
+
+  get vehicleWebpUrl(): string {
+    if (this.vehicle.slug) {
+      return `assets/images/fleet/${this.vehicle.slug}/${this.vehicle.slug}.webp`;
+    }
+    return this.vehicle.image.replace(/\.jpg$/i, '.webp');
   }
 
   onImageError(event: Event): void {

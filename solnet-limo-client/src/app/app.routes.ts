@@ -24,7 +24,7 @@ export const routes: Routes = [
           import("./features/public/about/about.component").then(
             (m) => m.AboutComponent,
           ),
-        title: "About Us | Solnet Limo",
+        title: "About Solnet Limo | Houston Chauffeur Service",
       },
       {
         path: "services",
@@ -32,7 +32,8 @@ export const routes: Routes = [
           import("./features/public/services/services.component").then(
             (m) => m.ServicesComponent,
           ),
-        title: "Our Services | Solnet Limo",
+        title:
+          "Houston Transportation Services | Airport, Corporate & Event Limo | Solnet Limo",
       },
       {
         path: "fleet",
@@ -40,7 +41,8 @@ export const routes: Routes = [
           import("./features/public/fleet/fleet.component").then(
             (m) => m.FleetComponent,
           ),
-        title: "Our Fleet | Solnet Limo",
+        title:
+          "Luxury Limo Fleet in Houston | SUVs, Sedans & Limousines | Solnet Limo",
       },
       {
         path: "booking",
@@ -48,7 +50,8 @@ export const routes: Routes = [
           import("./features/public/booking/booking.component").then(
             (m) => m.BookingComponent,
           ),
-        title: "Book a Ride | Solnet Limo",
+        title:
+          "Book Houston Limo Service | Airport & Chauffeur Reservation | Solnet Limo",
       },
       {
         path: "bookings",
@@ -61,7 +64,7 @@ export const routes: Routes = [
           import("./features/public/contact/contact.component").then(
             (m) => m.ContactComponent,
           ),
-        title: "Contact Us | Solnet Limo",
+        title: "Contact Solnet Limo | Houston Limo & Airport Transportation",
       },
       {
         path: "faq",
@@ -69,7 +72,8 @@ export const routes: Routes = [
           import("./features/public/faq/faq.component").then(
             (m) => m.FaqComponent,
           ),
-        title: "FAQ | Solnet Limo",
+        title:
+          "Houston Limo FAQ | Airport Transportation & Booking Questions | Solnet Limo",
       },
     ],
   },
